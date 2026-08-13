@@ -6,43 +6,7 @@ import {
   resolveElectronBinary,
   webUrl,
 } from "../lib/desktop.js";
-
-/** A minimal stand-in for node:child_process ChildProcess. */
-function makeChild(pid = 4242) {
-  const handlers = new Map();
-  const child = {
-    pid,
-    exitCode: null,
-    killed: false,
-    once(event, fn) {
-      const list = handlers.get(event) ?? [];
-      list.push(fn);
-      handlers.set(event, list);
-    },
-    emit(event, ...args) {
-      for (const fn of handlers.get(event) ?? []) fn(...args);
-    },
-    kill() {
-      if (this.killed) return;
-      this.killed = true;
-      this.exitCode = 0;
-      this.emit("exit", 0);
-    },
-  };
-  return child;
-}
-
-function makeSpawnRecorder() {
-  const calls = [];
-  return {
-    calls,
-    fn: (command, args, options) => {
-      const child = makeChild(4000 + calls.length);
-      calls.push({ command, args, options, child });
-      return child;
-    },
-  };
-}
+import { makeSpawnRecorder } from "./helpers.mjs";
 
 const MAIN_PATH = "C:/plugin/desktop/main.cjs";
 const ELECTRON = "C:/plugin/node_modules/electron/dist/electron.exe";
@@ -61,14 +25,9 @@ test("webUrl builds the loopback URL for a port", () => {
   assert.equal(webUrl(4321, "127.0.0.1"), "http://127.0.0.1:4321");
 });
 
-test("buildWindowArgs orders electronArgs before the window hints", () => {
-  const args = buildWindowArgs("http://127.0.0.1:3080", {
-    ...BASE_OPTIONS,
-    electronArgs: ["--no-sandbox", "--disable-gpu"],
-  });
+test("buildWindowArgs builds the app argv after the main script", () => {
+  const args = buildWindowArgs("http://127.0.0.1:3080", BASE_OPTIONS);
   assert.deepEqual(args, [
-    "--no-sandbox",
-    "--disable-gpu",
     "--url=http://127.0.0.1:3080",
     "--title=DeepSeek Harness",
     "--theme=codex",
@@ -85,6 +44,13 @@ test("buildWindowArgs carries the default theme and custom size", () => {
   });
   assert.ok(args.includes("--theme=default"));
   assert.ok(args.includes("--size=1024x768"));
+});
+
+test("buildWindowArgs appends --parent-pid when provided, omits it otherwise", () => {
+  const withPid = buildWindowArgs("http://127.0.0.1:3080", BASE_OPTIONS, 4242);
+  assert.ok(withPid.includes("--parent-pid=4242"));
+  const without = buildWindowArgs("http://127.0.0.1:3080", BASE_OPTIONS);
+  assert.ok(!without.some((arg) => arg.startsWith("--parent-pid=")));
 });
 
 test("resolveElectronBinary prefers DSH_DESKTOP_ELECTRON over require()", () => {
@@ -120,23 +86,30 @@ test("resolveElectronBinary returns undefined when require throws or returns jun
   assert.equal(resolveElectronBinary(() => "", {}), undefined);
 });
 
-test("open spawns electron with the main script and window args", () => {
+test("open spawns electron with switches, main script, then app args", () => {
   const recorder = makeSpawnRecorder();
   const manager = new WindowManager({
     spawn: recorder.fn,
     electronPath: ELECTRON,
     mainPath: MAIN_PATH,
+    parentPid: 4242,
   });
 
-  const result = manager.open("http://127.0.0.1:3080", BASE_OPTIONS);
+  const result = manager.open("http://127.0.0.1:3080", {
+    ...BASE_OPTIONS,
+    electronArgs: ["--no-sandbox", "--disable-gpu"],
+  });
   assert.equal(result.ok, true);
   assert.equal(result.ok && result.pid, 4000);
 
   assert.equal(recorder.calls.length, 1);
   const call = recorder.calls[0];
   assert.equal(call.command, ELECTRON);
-  assert.equal(call.args[0], MAIN_PATH);
+  // Electron CLI switches precede the app path; app args follow it.
+  assert.deepEqual(call.args.slice(0, 2), ["--no-sandbox", "--disable-gpu"]);
+  assert.equal(call.args[2], MAIN_PATH);
   assert.ok(call.args.includes("--url=http://127.0.0.1:3080"));
+  assert.ok(call.args.includes("--parent-pid=4242"));
   assert.equal(call.options.stdio, "ignore");
   assert.equal(call.options.env, process.env);
 

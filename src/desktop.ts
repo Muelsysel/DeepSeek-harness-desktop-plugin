@@ -5,6 +5,7 @@
  * @module dsh-desktop/desktop
  */
 import type { ChildProcess } from "node:child_process";
+import { fileURLToPath } from "node:url";
 
 /** Window presentation options carried from plugin config into the shell. */
 export interface WindowOptions {
@@ -17,7 +18,7 @@ export interface WindowOptions {
   /** `codex` applies the Codex-like skin; `default` keeps the stock UI. */
   readonly theme: "codex" | "default";
   /** Extra argv passed to the Electron binary before the main script. */
-  readonly electronArgs: readonly string[];
+  readonly electronArgs: string[];
 }
 
 /** Minimal spawn signature the manager needs, injectable for tests. */
@@ -69,16 +70,24 @@ export function webUrl(port: number, host = "127.0.0.1"): string {
 }
 
 /**
- * argv for the Electron main process: everything after the main script path.
- * `--url` is required; the rest are presentation hints.
+ * App argv for the Electron main process (everything after the main script
+ * path). `--url` is required; the rest are presentation hints. `parentPid`
+ * arms the shell's orphan watchdog (the window quits when its dsh parent
+ * dies). Electron CLI switches (`options.electronArgs`) are NOT included here
+ * — the spawner places them before the main script path, where Chromium
+ * expects them.
  */
-export function buildWindowArgs(url: string, options: WindowOptions): string[] {
+export function buildWindowArgs(
+  url: string,
+  options: WindowOptions,
+  parentPid?: number,
+): string[] {
   return [
-    ...options.electronArgs,
     `--url=${url}`,
     `--title=${options.title}`,
     `--theme=${options.theme}`,
     `--size=${options.width}x${options.height}`,
+    ...(parentPid === undefined ? [] : [`--parent-pid=${parentPid}`]),
   ];
 }
 
@@ -111,6 +120,7 @@ export class WindowManager {
   readonly #spawn: SpawnFn;
   readonly #electronPath: string | undefined;
   readonly #mainPath: string;
+  readonly #parentPid: number | undefined;
   #active: WindowHandle | undefined;
   #lastError: string | undefined;
 
@@ -118,10 +128,12 @@ export class WindowManager {
     spawn: SpawnFn;
     electronPath: string | undefined;
     mainPath: string;
+    parentPid?: number;
   }) {
     this.#spawn = options.spawn;
     this.#electronPath = options.electronPath;
     this.#mainPath = options.mainPath;
+    this.#parentPid = options.parentPid;
   }
 
   /** The resolved Electron binary, or undefined when unavailable. */
@@ -157,13 +169,19 @@ export class WindowManager {
       const active = this.#active;
       if (active !== undefined) return { ok: true, pid: active.pid };
     }
-    const args = buildWindowArgs(url, options);
+    const windowArgs = buildWindowArgs(url, options, this.#parentPid);
     let child: ChildProcess;
     try {
-      child = this.#spawn(electronPath, [this.#mainPath, ...args], {
-        stdio: "ignore",
-        env: process.env,
-      });
+      // Electron CLI switches (e.g. --no-sandbox, --remote-debugging-port)
+      // must precede the app path; anything after it is an app argument.
+      child = this.#spawn(
+        electronPath,
+        [...options.electronArgs, this.#mainPath, ...windowArgs],
+        {
+          stdio: "ignore",
+          env: process.env,
+        },
+      );
     } catch (error) {
       this.#lastError = `spawn failed: ${String(error)}`;
       return { ok: false, reason: this.#lastError };
@@ -191,11 +209,41 @@ export class WindowManager {
 }
 
 /**
+ * Build the plugin's window manager from runtime inputs. `mainPath` defaults
+ * to this package's own Electron entry so the plugin surface stays a pure
+ * adapter.
+ */
+export function createWindowManager(options: {
+  requireFn: (id: string) => unknown;
+  env: NodeJS.ProcessEnv;
+  spawn: SpawnFn;
+  mainPath?: string;
+  parentPid?: number;
+}): WindowManager {
+  const mainPath =
+    options.mainPath ??
+    fileURLToPath(new URL("../desktop/main.cjs", import.meta.url));
+  return new WindowManager({
+    spawn: options.spawn,
+    electronPath: resolveElectronBinary(options.requireFn, options.env),
+    mainPath,
+    parentPid: options.parentPid ?? process.pid,
+  });
+}
+
+/**
  * Wire the desktop plugin into a live context: register the `/desktop`
  * command, optionally auto-open on boot, and tear the window down with the
  * context. Extracted from the plugin entry so tests can drive it with fakes.
  */
 export function mountDesktop(ctx: DesktopCtx, config: WindowOptions & { autoOpen: boolean }, manager: WindowManager): void {
+  // Boot diagnostics, only when the debug flag is set.
+  if (process.env.DSH_DESKTOP_DEBUG) {
+    console.log(
+      `[dsh-desktop] apply autoOpen=${String(config.autoOpen)} electron=${manager.electronPath ?? "MISSING"}`,
+    );
+  }
+
   ctx.effect(function* () {
     yield ctx.commands.register({
       name: "desktop",

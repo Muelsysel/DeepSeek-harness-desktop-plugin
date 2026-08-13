@@ -1,15 +1,19 @@
 #!/usr/bin/env node
 /**
- * Install (or update) the dsh-desktop plugin into a dsh profile.
+ * Install (or remove) the dsh-desktop plugin into/from a dsh profile.
  *
- *   node scripts/install-profile.mjs [--profile <name>] [--dsh <path>]
+ *   node scripts/install-profile.mjs [--profile <name>] [--remove]
  *
- * Steps:
+ * Install steps:
  *   1. resolve the profile directory under $DSH_HOME/profiles/<name>
- *   2. install this package into the profile with pnpm (`file:` dependency)
+ *   2. install this package into the profile with pnpm (`link:` dependency)
  *   3. append `dsh-desktop` to the profile's `dsh.profile.bundles` list
  *      (idempotent), backing up package.json first
  *   4. print what was done and how to launch
+ *
+ * With `--remove`, step 2/3 are inverted: the bundle entry is dropped (with a
+ * backup) and the package is removed via pnpm. This is the single owner of
+ * the bundle-list mutation — bin/uninstall.cmd routes through here.
  *
  * The bundle row itself lives in patch/desktop.bundle.yml; auto-open is driven
  * by DSH_DESKTOP_LAUNCH so `dsh web` stays browser-first by default.
@@ -21,13 +25,14 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(__dirname, "..");
+const PLUGIN_NAME = "dsh-desktop";
 
 function parseArgs(argv) {
-  const out = { profile: "web", dsh: undefined, help: false };
+  const out = { profile: "web", remove: false, help: false };
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
     if (arg === "--profile") out.profile = argv[++i];
-    else if (arg === "--dsh") out.dsh = argv[++i];
+    else if (arg === "--remove") out.remove = true;
     else if (arg === "--help" || arg === "-h") out.help = true;
   }
   return out;
@@ -44,15 +49,28 @@ function profileDir(name) {
 /** Run a command, returning trimmed stdout. */
 function run(command, args, opts = {}) {
   return execFileSync(command, args, { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"], ...opts }).trim();
-}/** Append `dsh-desktop` to the profile's bundles list, idempotently. */
+}
+
+/** Append `dsh-desktop` to the profile's bundles list, idempotently. Returns whether a backup was written. */
 function ensureBundle(profilePkgPath) {
   const pkg = JSON.parse(readFileSync(profilePkgPath, "utf8"));
   const bundles = pkg.dsh?.profile?.bundles;
   if (!Array.isArray(bundles)) {
     throw new Error(`profile package.json at ${profilePkgPath} has no dsh.profile.bundles array`);
   }
-  if (bundles.includes("dsh-desktop")) return false;
-  bundles.push("dsh-desktop");
+  if (bundles.includes(PLUGIN_NAME)) return false;
+  bundles.push(PLUGIN_NAME);
+  copyFileSync(profilePkgPath, `${profilePkgPath}.bak`);
+  writeFileSync(profilePkgPath, `${JSON.stringify(pkg, null, 2)}\n`, "utf8");
+  return true;
+}
+
+/** Drop `dsh-desktop` from the profile's bundles list, idempotently. Returns whether a backup was written. */
+function dropBundle(profilePkgPath) {
+  const pkg = JSON.parse(readFileSync(profilePkgPath, "utf8"));
+  const bundles = pkg.dsh?.profile?.bundles;
+  if (!Array.isArray(bundles) || !bundles.includes(PLUGIN_NAME)) return false;
+  pkg.dsh.profile.bundles = bundles.filter((name) => name !== PLUGIN_NAME);
   copyFileSync(profilePkgPath, `${profilePkgPath}.bak`);
   writeFileSync(profilePkgPath, `${JSON.stringify(pkg, null, 2)}\n`, "utf8");
   return true;
@@ -61,7 +79,7 @@ function ensureBundle(profilePkgPath) {
 function main() {
   const args = parseArgs(process.argv.slice(2));
   if (args.help) {
-    console.log("usage: node scripts/install-profile.mjs [--profile web] [--dsh <path-to-dsh>]");
+    console.log("usage: node scripts/install-profile.mjs [--profile web] [--remove]");
     return;
   }
 
@@ -73,6 +91,19 @@ function main() {
   const packageJsonPath = join(profile, "package.json");
   if (!existsSync(packageJsonPath)) {
     throw new Error(`profile has no package.json: ${packageJsonPath}`);
+  }
+
+  if (args.remove) {
+    console.log(`removing dsh-desktop from profile "${args.profile}" (${profile}) ...`);
+    const dropped = dropBundle(packageJsonPath);
+    console.log(dropped ? "dropped dsh-desktop from dsh.profile.bundles (backup: package.json.bak)" : "dsh-desktop not in dsh.profile.bundles");
+    try {
+      run("pnpm", ["remove", PLUGIN_NAME], { cwd: profile, shell: process.platform === "win32" });
+      console.log("removed dsh-desktop package from the profile");
+    } catch {
+      console.log("pnpm remove skipped (package may already be gone; run: pnpm --dir <profile> remove dsh-desktop)");
+    }
+    return;
   }
 
   // 1. install this package into the profile (pnpm add link:<repo>)

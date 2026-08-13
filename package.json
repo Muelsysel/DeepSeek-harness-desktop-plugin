@@ -39,7 +39,6 @@
   "dependencies": {
     "@deepseek-ai/cordis": "^4.0.1",
     "@deepseek-ai/dsh-commands": "^0.1.0-rc.6",
-    "@deepseek-ai/dsh-invariants": "^0.1.0-rc.6",
     "@deepseek-ai/schemastery": "^3.18.1",
     "electron": "^43.4.0"
   },

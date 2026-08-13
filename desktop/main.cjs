@@ -24,6 +24,7 @@ function parseArgs(argv) {
     theme: 'codex',
     width: 1280,
     height: 800,
+    parentPid: 0,
   };
   for (const arg of argv) {
     const match = /^--([a-z][a-z0-9-]*)=(.*)$/i.exec(arg);
@@ -33,6 +34,7 @@ function parseArgs(argv) {
     if (key === 'url') out.url = value;
     else if (key === 'title') out.title = value;
     else if (key === 'theme') out.theme = value === 'default' ? 'default' : 'codex';
+    else if (key === 'parent-pid') out.parentPid = Number(value) || 0;
     else if (key === 'size') {
       const size = /^(\d+)x(\d+)$/.exec(value);
       if (size) {
@@ -80,6 +82,20 @@ if (opts.theme === 'codex') {
   nativeTheme.themeSource = 'dark';
 }
 
+// Orphan watchdog: if the spawning dsh process dies hard (taskkill, crash),
+// the plugin's teardown never runs, so the shell watches the parent pid and
+// quits itself. process.kill(pid, 0) only probes existence.
+if (opts.parentPid > 0) {
+  const watchdog = setInterval(() => {
+    try {
+      process.kill(opts.parentPid, 0);
+    } catch {
+      app.quit();
+    }
+  }, 2000);
+  app.on('will-quit', () => clearInterval(watchdog));
+}
+
 const gotLock = app.requestSingleInstanceLock();
 if (!gotLock) {
   // Another window for this backend is already up — ask it to focus.
@@ -112,8 +128,8 @@ function createWindow() {
     title: opts.title,
     width: opts.width,
     height: opts.height,
-    minWidth: 720,
-    minHeight: 480,
+    minWidth: 320,
+    minHeight: 240,
     backgroundColor: isCodex ? '#0d1117' : '#ffffff',
     autoHideMenuBar: true,
     show: false,
@@ -134,11 +150,19 @@ function createWindow() {
     return { action: 'deny' };
   });
 
-  // Stay inside the dsh UI; navigation away opens the system browser.
+  // Stay inside the dsh UI; navigation to any other origin opens the system
+  // browser. Origin comparison, not prefix matching: `127.0.0.1:3080.evil.com`
+  // and `:30800` must NOT load inside the window.
   win.webContents.on('will-navigate', (event, target) => {
-    if (target !== opts.url && !target.startsWith(opts.url)) {
+    try {
+      const base = new URL(opts.url);
+      const next = new URL(target);
+      if (next.origin !== base.origin) {
+        event.preventDefault();
+        shell.openExternal(target);
+      }
+    } catch {
       event.preventDefault();
-      shell.openExternal(target);
     }
   });
 

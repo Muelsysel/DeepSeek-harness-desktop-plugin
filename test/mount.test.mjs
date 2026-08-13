@@ -1,47 +1,10 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { WindowManager, mountDesktop } from "../lib/desktop.js";
+import { makeSpawnRecorder } from "./helpers.mjs";
 
 const MAIN_PATH = "C:/plugin/desktop/main.cjs";
 const ELECTRON = "C:/plugin/node_modules/electron/dist/electron.exe";
-
-/** Minimal stand-in for node:child_process ChildProcess. */
-function makeChild(pid = 7001) {
-  const handlers = new Map();
-  const child = {
-    pid,
-    exitCode: null,
-    killed: false,
-    once(event, fn) {
-      const list = handlers.get(event) ?? [];
-      list.push(fn);
-      handlers.set(event, list);
-    },
-    emit(event, ...args) {
-      for (const fn of handlers.get(event) ?? []) fn(...args);
-    },
-    kill() {
-      if (this.killed) return;
-      this.killed = true;
-      this.exitCode = 0;
-      this.emit("exit", 0);
-    },
-  };
-  return child;
-}
-
-/** Fake spawn that records calls and returns fresh children. */
-function makeSpawnRecorder() {
-  const calls = [];
-  return {
-    calls,
-    fn: (command, args, options) => {
-      const child = makeChild(7000 + calls.length);
-      calls.push({ command, args, options, child });
-      return child;
-    },
-  };
-}
 
 /**
  * A Cordis-shaped fake context. `effect` runs the generator eagerly and
@@ -116,7 +79,7 @@ test("the command handler opens the window at the live server URL", async () => 
 
   assert.equal(result.kind, "success");
   assert.match(result.kind === "success" ? result.text : "", /http:\/\/127\.0\.0\.1:4321/);
-  assert.match(result.kind === "success" ? result.text : "", /pid 7000/);
+  assert.match(result.kind === "success" ? result.text : "", /pid 4000/);
   assert.equal(recorder.calls.length, 1);
   assert.ok(recorder.calls[0].args.includes("--url=http://127.0.0.1:4321"));
 });

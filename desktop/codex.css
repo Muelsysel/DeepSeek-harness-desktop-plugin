@@ -4,8 +4,9 @@
  * The dsh web UI themes itself through `--dsw-*` design tokens resolved on
  * `body[data-ds-dark-theme]`. This stylesheet re-targets the alias tokens to
  * a GitHub-dark / Codex palette, so the desktop window reads like Codex while
- * every DSH feature keeps working. Injected via webContents.insertCSS by the
- * Electron main when `--theme=codex`.
+ * every DSH feature keeps working. Injected by the Electron main when
+ * `--theme=codex`: the shell appends this file as a <style> element (via
+ * executeJavaScript) and re-applies it on every committed navigation.
  */
 
 body[data-ds-dark-theme] {
