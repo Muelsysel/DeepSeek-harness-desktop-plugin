@@ -12,4 +12,5 @@
       inject: [commands, webServer]
       config:
         autoOpen: !!js process.env.DSH_DESKTOP_LAUNCH === '1'
+        exitOnClose: !!js process.env.DSH_DESKTOP_APP === '1'
         title: !!js process.env.DSH_DESKTOP_TITLE ?? 'DeepSeek Harness'

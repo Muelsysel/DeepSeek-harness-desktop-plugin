@@ -54,7 +54,10 @@ export interface DesktopCtx {
       handler: (invocation: unknown) => CommandResult | Promise<CommandResult>;
     }): () => void;
   };
-  readonly logger: { readonly warn: (message: string) => void };
+  readonly logger: {
+    readonly warn: (message: string) => void;
+    readonly info?: (message: string) => void;
+  };
   /** Run a Cordis-style effect generator; returns the disposer. */
   effect(execute: () => SyncEffectLike, label?: string): () => Promise<void>;
 }
@@ -123,6 +126,7 @@ export class WindowManager {
   readonly #parentPid: number | undefined;
   #active: WindowHandle | undefined;
   #lastError: string | undefined;
+  #exitHandlers: Array<() => void> = [];
 
   constructor(options: {
     spawn: SpawnFn;
@@ -134,6 +138,14 @@ export class WindowManager {
     this.#electronPath = options.electronPath;
     this.#mainPath = options.mainPath;
     this.#parentPid = options.parentPid;
+  }
+
+  /**
+   * Register a handler invoked whenever the live window child exits (user
+   * closed it, it crashed, or it was killed). Handlers fire once per exit.
+   */
+  onExit(handler: () => void): void {
+    this.#exitHandlers.push(handler);
   }
 
   /** The resolved Electron binary, or undefined when unavailable. */
@@ -194,6 +206,15 @@ export class WindowManager {
     });
     child.once("exit", () => {
       if (this.#active?.child === child) this.#active = undefined;
+      const handlers = this.#exitHandlers;
+      this.#exitHandlers = [];
+      for (const handler of handlers) {
+        try {
+          handler();
+        } catch {
+          /* a watcher must never break the manager */
+        }
+      }
     });
     return { ok: true, pid };
   }
@@ -232,17 +253,51 @@ export function createWindowManager(options: {
 }
 
 /**
+ * Stop the whole profile when the desktop window is the app surface and the
+ * user closes it. Reuses the runtime's own SIGTERM path — the profile boot
+ * registers a `SIGTERM` listener that disposes the plugin tree gracefully
+ * (session persistence drains, subprocesses are cleaned up). A safety net
+ * hard-exits shortly after if no handler reacted (e.g. not running under the
+ * standard boot).
+ */
+export function shutdownGracefully(): void {
+  try {
+    process.emit("SIGTERM");
+  } catch {
+    /* fall through to the safety net */
+  }
+  setTimeout(() => process.exit(0), 2000).unref();
+}
+
+/**
  * Wire the desktop plugin into a live context: register the `/desktop`
  * command, optionally auto-open on boot, and tear the window down with the
  * context. Extracted from the plugin entry so tests can drive it with fakes.
  */
-export function mountDesktop(ctx: DesktopCtx, config: WindowOptions & { autoOpen: boolean }, manager: WindowManager): void {
+export function mountDesktop(
+  ctx: DesktopCtx,
+  config: WindowOptions & { autoOpen: boolean; exitOnClose: boolean },
+  manager: WindowManager,
+  shutdown: () => void = shutdownGracefully,
+): void {
   // Boot diagnostics, only when the debug flag is set.
   if (process.env.DSH_DESKTOP_DEBUG) {
     console.log(
       `[dsh-desktop] apply autoOpen=${String(config.autoOpen)} electron=${manager.electronPath ?? "MISSING"}`,
     );
   }
+
+  // In app mode the window IS the app: closing it stops the backend.
+  let exitArmed = false;
+  const armExitOnClose = () => {
+    if (config.exitOnClose && !exitArmed) {
+      exitArmed = true;
+      manager.onExit(() => {
+        ctx.logger.info?.(`dsh-desktop: window closed; shutting down the profile`);
+        shutdown();
+      });
+    }
+  };
 
   ctx.effect(function* () {
     yield ctx.commands.register({
@@ -254,6 +309,7 @@ export function mountDesktop(ctx: DesktopCtx, config: WindowOptions & { autoOpen
         if (!opened.ok) {
           return { kind: "error", text: `Desktop window unavailable: ${opened.reason}` };
         }
+        armExitOnClose();
         return { kind: "success", text: `Desktop window opened → ${url} (pid ${opened.pid})` };
       },
     });
@@ -262,6 +318,7 @@ export function mountDesktop(ctx: DesktopCtx, config: WindowOptions & { autoOpen
       const url = webUrl(ctx.webServer.port);
       const opened = manager.open(url, config);
       if (!opened.ok) ctx.logger.warn(`dsh-desktop: auto-open failed: ${opened.reason}`);
+      else armExitOnClose();
     }
 
     yield async () => manager.close();

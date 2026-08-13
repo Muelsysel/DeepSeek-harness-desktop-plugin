@@ -1,16 +1,30 @@
 @echo off
 rem =====================================================================
-rem  dsh-desktop - one-click launcher.
+rem  dsh-desktop - one-click launcher (desktop app mode).
 rem
-rem  Boots the dsh web profile with the desktop window auto-opened. The
+rem  Boots the dsh web profile with the desktop window auto-opened, and
+rem  arms app mode: closing the window also shuts the backend down. The
 rem  plugin must be installed into the profile first (bin\install.cmd).
 rem
 rem  Port: uses DSH_DESKTOP_PORT when set, else --port 0 (OS-assigned),
 rem  so it never collides with another dsh instance on 3080. Any --port
 rem  you pass on the command line wins.
+rem
+rem  Double-clicking runs hidden (no console window) via launch-hidden.vbs;
+rem  running with arguments keeps the console for diagnostics.
 rem =====================================================================
 setlocal
+
+if "%~1"=="" (
+  if /i not "%DSH_DESKTOP_HIDDEN%"=="1" (
+    set "DSH_DESKTOP_HIDDEN=1"
+    start "" wscript.exe "%~dp0launch-hidden.vbs"
+    exit /b 0
+  )
+)
+
 set DSH_DESKTOP_LAUNCH=1
+set DSH_DESKTOP_APP=1
 
 set PORT_ARGS=
 echo %* | findstr /i /c:"--port" >nul

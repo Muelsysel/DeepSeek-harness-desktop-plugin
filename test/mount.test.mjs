@@ -46,6 +46,7 @@ const BASE_CONFIG = {
   height: 800,
   theme: "codex",
   electronArgs: [],
+  exitOnClose: false,
 };
 
 function makeManager(recorder) {
@@ -146,4 +147,65 @@ test("effect teardown closes the window child", () => {
     if (typeof disposer === "function") disposer();
   }
   assert.equal(child.killed, true);
+});
+
+test("exitOnClose shuts the profile down when the window closes", () => {
+  const recorder = makeSpawnRecorder();
+  const { ctx } = makeCtx();
+  let shutdownCalled = 0;
+  const manager = makeManager(recorder);
+  mountDesktop(
+    ctx,
+    { ...BASE_CONFIG, autoOpen: true, exitOnClose: true },
+    manager,
+    () => {
+      shutdownCalled += 1;
+    },
+  );
+
+  assert.equal(shutdownCalled, 0);
+  recorder.calls[0].child.emit("exit", 0);
+  assert.equal(shutdownCalled, 1);
+});
+
+test("exitOnClose=false leaves the profile running when the window closes", () => {
+  const recorder = makeSpawnRecorder();
+  const { ctx } = makeCtx();
+  let shutdownCalled = 0;
+  const manager = makeManager(recorder);
+  mountDesktop(
+    ctx,
+    { ...BASE_CONFIG, autoOpen: true, exitOnClose: false },
+    manager,
+    () => {
+      shutdownCalled += 1;
+    },
+  );
+
+  recorder.calls[0].child.emit("exit", 0);
+  assert.equal(shutdownCalled, 0);
+});
+
+test("exitOnClose arms through the /desktop command too", async () => {
+  const recorder = makeSpawnRecorder();
+  const { ctx, registrations } = makeCtx();
+  let shutdownCalled = 0;
+  const manager = makeManager(recorder);
+  mountDesktop(
+    ctx,
+    { ...BASE_CONFIG, exitOnClose: true },
+    manager,
+    () => {
+      shutdownCalled += 1;
+    },
+  );
+
+  await registrations[0].handler({
+    commandId: "c3",
+    agent: {},
+    rawInput: "",
+    signal: new AbortController().signal,
+  });
+  recorder.calls[0].child.emit("exit", 0);
+  assert.equal(shutdownCalled, 1);
 });

@@ -26,14 +26,17 @@ export const name = "desktop";
 /** Requires the human-command registry and the live web server. */
 export const inject = ["commands", "webServer"];
 
-/** Plugin configuration surface: the window presentation plus auto-open. */
+/** Plugin configuration surface: the window presentation plus lifecycle. */
 export interface Config extends WindowOptions {
   /** Open the window automatically as soon as the web server is up. */
   autoOpen: boolean;
+  /** Stop the whole profile when the desktop window closes (app mode). */
+  exitOnClose: boolean;
 }
 
 export const Config: z<Config> = z.object({
   autoOpen: z.boolean().default(false),
+  exitOnClose: z.boolean().default(false),
   title: z.string().default("DeepSeek Harness"),
   width: z.natural().min(320).default(1280),
   height: z.natural().min(240).default(800),
