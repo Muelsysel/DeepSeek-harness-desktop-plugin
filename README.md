@@ -26,11 +26,12 @@ bin\dsh-desktop.cmd            :: 等价于 DSH_DESKTOP_LAUNCH=1 dsh web
 
 安装做了什么：
 
-1. 用 pnpm 把本插件作为 `file:` 依赖装进 `$DSH_HOME\profiles\web`
+1. 用 pnpm 把本插件作为 `link:` 依赖装进 `$DSH_HOME\profiles\web`（本地安装始终跟随仓库源码，改代码即时生效）
 2. 把 `dsh-desktop` 追加到 profile 的 `dsh.profile.bundles`（幂等，有备份）
 3. bundle patch（`patch\desktop.bundle.yml`）插入 `desktop` 行：`autoOpen` 由 `DSH_DESKTOP_LAUNCH` 决定
 
 > 不设置 `DSH_DESKTOP_LAUNCH` 时，普通 `dsh web` 保持"只用浏览器"的行为，不会弹窗。
+> 端口：launcher 默认 `--port 0`（系统分配空闲端口，绝不和 3080 冲突）；设 `DSH_DESKTOP_PORT` 可固定端口，或直接加 `--port 3180`。
 
 ## 用法
 
