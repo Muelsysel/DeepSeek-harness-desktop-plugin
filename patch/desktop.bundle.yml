@@ -1,0 +1,15 @@
+# dsh-desktop bundle patch.
+#
+# Mounted by adding `dsh-desktop` to a profile's `dsh.profile.bundles` list
+# (see scripts/install-profile.mjs). It inserts one row: the desktop window
+# plugin, requiring the human-command registry and the live web server.
+#
+# The window auto-opens when DSH_DESKTOP_LAUNCH=1 (set by bin/dsh-desktop.cmd)
+# so a plain `dsh web` keeps its browser-only behavior unless asked.
+- insert:
+    - id: desktop
+      name: 'dsh-desktop'
+      inject: [commands, webServer]
+      config:
+        autoOpen: !!js process.env.DSH_DESKTOP_LAUNCH === '1'
+        title: !!js process.env.DSH_DESKTOP_TITLE ?? 'DeepSeek Harness'
