@@ -20,22 +20,24 @@
 
 ## 怎么用
 
-### 方式一：安装版 setup.exe（推荐，自带后端、免环境）
+### 方式一：zip 便携版（推荐，免安装）
+
+1. 到 [GitHub Releases](https://github.com/Muelsysel/DeepSeek-Harness-Desktop/releases) 下载 `DeepSeek-harness-desktop-plugin-<版本>.zip` 并解压（需 Node.js ≥ 22.19，**必须**；pnpm 无需手动安装，注册时自动装）
+2. **首次请先运行根目录 `start.cmd`** 走完首次引导（[1/5] 检查 Node.js → [2/5] 检查 DeepSeek Harness（未装时 launcher 自动通过 `npx @deepseek-ai/dsh web` 获取）→ [3/5] 注册插件 → [4/5] 创建桌面快捷方式 → [5/5] 启动）
+3. 之后日常使用任选其一：
+   - 桌面快捷方式「`DeepSeek Harness 桌面版.lnk`」——右键 → **发送到 → 桌面快捷方式**，以后双击桌面图标即可启动；第一次点击会自动注册插件再启动
+   - 若解压位置与快捷方式指向的路径不同，改用 `create-shortcut.cmd`（双击一次即可按你的解压位置生成正确路径的桌面快捷方式）
+   - 或直接双击 `bin\dsh-desktop.cmd` 一键启动
+
+也可以跳过引导：直接双击 `bin\dsh-desktop.cmd`，首次点击会自动注册插件再启动。注册过一次之后，每次点快捷方式都是秒开。
+
+### 方式二：安装版 setup.exe（自带后端、免环境）
 
 1. 到 [GitHub Releases](https://github.com/Muelsysel/DeepSeek-Harness-Desktop/releases) 下载 `DeepSeek-Harness-Desktop-Setup-<版本>.exe`
 2. 双击安装（免管理员），安装完成自动启动
 3. **无需安装 Node.js / pnpm / DeepSeek Harness** —— 后端和 Electron 运行时全部内置；首次启动闪屏显示初始化进度，之后秒开
 
 安装位置：`%LOCALAPPDATA%\Programs\DeepSeek-Harness-Desktop`（无空格路径）。启动入口：桌面快捷方式（鲸鱼图标）、开始菜单、安装目录内的 `DeepSeek Harness Desktop.lnk`，任选其一。私有数据放在 `%APPDATA%\DeepSeek-Harness-Desktop`（不碰你的 `$DSH_HOME` profile），**关窗即退出**。
-
-### 方式二：zip 便携版（免安装，需本地 Node.js）
-
-1. 下载 `DeepSeek-harness-desktop-plugin-<版本>.zip` 并解压（需 Node.js ≥ 22.19，**必须**；pnpm 无需手动安装，注册时自动装）
-2. **快捷方式（免脚本）**：解压后根目录已带「`DeepSeek Harness 桌面版.lnk`」——右键它 → **发送到 → 桌面快捷方式**，以后双击桌面图标即可启动；第一次点击会自动注册插件再启动
-   - 若解压位置与快捷方式指向的路径不同，请改用 `create-shortcut.cmd`（双击一次即可按你的解压位置生成正确路径的桌面快捷方式）
-3. 也可以双击根目录 **`start.cmd`** 走完首次引导（[1/5] 检查 Node.js → [2/5] 检查 DeepSeek Harness（未装时 launcher 自动通过 `npx @deepseek-ai/dsh web` 获取）→ [3/5] 注册插件 → [4/5] 创建桌面快捷方式 → [5/5] 启动）
-
-也可以跳过引导：直接双击 `bin\dsh-desktop.cmd`，首次点击会自动注册插件再启动。注册过一次之后，每次点快捷方式都是秒开。
 
 ### 方式三：手动装进已有 dsh profile（进阶）
 
@@ -61,9 +63,9 @@ bin\dsh-desktop.cmd
 
 | 方式 | 说明 |
 |---|---|
-| 安装版 setup.exe | **自带后端**：免 Node/pnpm/dsh，闪屏进度，首次初始化后秒开；桌面 / 开始菜单 / 安装目录三处启动入口 |
+| zip 版 + `start.cmd`（根目录） | **推荐**：需 Node.js ≥ 22.19，首次先运行 `start.cmd` 引导 [1/5]–[5/5]，之后秒开 |
 | 根目录「DeepSeek Harness 桌面版.lnk」 | zip 版免脚本快捷方式：右键 → 发送到 → 桌面快捷方式即可 |
-| zip 版 + `start.cmd`（根目录） | 插件方式：需 Node.js ≥ 22.19，首次引导 [1/5]–[5/5] 后秒开 |
+| 安装版 setup.exe | 自带后端：免 Node/pnpm/dsh，闪屏进度，首次初始化后秒开；桌面 / 开始菜单 / 安装目录三处启动入口 |
 | `create-shortcut.cmd`（根目录） | 一键生成桌面快捷方式（鲸鱼图标，按实际解压位置生成正确路径） |
 | `bin\dsh-desktop.cmd` | 一键启动：`dsh web` + 自动开窗（可加参数，如 `--port 3180`）；未注册时首次自动注册 |
 | Web UI 里 `/desktop` | 打开/复用当前后端的桌面窗口 |

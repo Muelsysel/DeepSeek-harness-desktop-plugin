@@ -20,22 +20,24 @@ Put DeepSeek Harness into a native desktop window: **double-click to launch**, a
 
 ## Getting started
 
-### Option 1: setup.exe installer (recommended — bundled backend, no environment needed)
+### Option 1: zip portable version (recommended, no install)
+
+1. Download `DeepSeek-harness-desktop-plugin-<version>.zip` from [GitHub Releases](https://github.com/Muelsysel/DeepSeek-Harness-Desktop/releases) and extract it (Node.js ≥ 22.19 **required**; pnpm is auto-installed during registration)
+2. **Run root `start.cmd` first** to go through the guided wizard: [1/5] Node.js check → [2/5] DeepSeek Harness check (the launcher fetches dsh via `npx @deepseek-ai/dsh web` when missing) → [3/5] register plugin → [4/5] create desktop shortcut → [5/5] launch
+3. For everyday use afterwards, pick one:
+   - The desktop shortcut "`DeepSeek Harness 桌面版.lnk`" — right-click → **Send to → Desktop (create shortcut)**; double-click it to launch (first click auto-registers the plugin)
+   - If you extracted to a different location than the shortcut points to, run `create-shortcut.cmd` once instead — it creates a desktop shortcut with the correct paths for your extraction location
+   - Or double-click `bin\dsh-desktop.cmd` to launch directly
+
+You can also skip the wizard: double-click `bin\dsh-desktop.cmd` — it auto-registers on first run, then launches instantly on every click afterwards.
+
+### Option 2: setup.exe installer (bundled backend, no environment needed)
 
 1. Download `DeepSeek-Harness-Desktop-Setup-<version>.exe` from [GitHub Releases](https://github.com/Muelsysel/DeepSeek-Harness-Desktop/releases)
 2. Run it (no admin required); the app launches automatically when the install finishes
 3. **No Node.js / pnpm / DeepSeek Harness needed** — the backend and the Electron runtime are bundled; the first launch shows progress (built-in dependency init), then it opens instantly
 
 Install location: `%LOCALAPPDATA%\Programs\DeepSeek-Harness-Desktop` (no spaces). **Launch entries**: Desktop shortcut (whale icon), Start Menu entry, and a `DeepSeek Harness Desktop.lnk` inside the install folder — any of the three works. Private data lives in `%APPDATA%\DeepSeek-Harness-Desktop` (your `$DSH_HOME` profiles are untouched); **closing the window exits the app**.
-
-### Option 2: zip portable version (no install, needs local Node.js)
-
-1. Download `DeepSeek-harness-desktop-plugin-<version>.zip` and extract it (Node.js ≥ 22.19 **required**; pnpm is auto-installed during registration)
-2. **Shortcut, no scripts**: the zip root already contains "`DeepSeek Harness 桌面版.lnk`" — right-click it → **Send to → Desktop (create shortcut)**; from then on double-click the desktop icon to launch (first click auto-registers the plugin)
-   - If you extracted to a different location than the shortcut points to, run `create-shortcut.cmd` once instead — it creates a desktop shortcut with the correct paths for your extraction location
-3. Alternatively double-click root **`start.cmd`** for the guided wizard: [1/5] Node.js check → [2/5] DeepSeek Harness check (the launcher fetches dsh via `npx @deepseek-ai/dsh web` when missing) → [3/5] register plugin → [4/5] create desktop shortcut → [5/5] launch
-
-You can also skip the wizard: double-click `bin\dsh-desktop.cmd` — it auto-registers on first run, then launches instantly on every click afterwards.
 
 ### Option 3: manual install into an existing dsh profile (advanced)
 
@@ -62,9 +64,9 @@ Usage summary:
 
 | Entry | Description |
 |---|---|
-| setup.exe installer | **Bundled backend**: no Node/pnpm/dsh needed, splash progress, instant after first init; three launch entries (Desktop / Start Menu / install folder) |
+| `start.cmd` (root) | **Recommended**: needs Node.js ≥ 22.19; run `start.cmd` first for the guided [1/5]–[5/5] wizard, then instant |
 | Root "DeepSeek Harness 桌面版.lnk" | Zip version, script-free shortcut: right-click → Send to → Desktop |
-| `start.cmd` (root) | Zip wizard: needs Node.js ≥ 22.19, guided [1/5]–[5/5] then instant |
+| setup.exe installer | Bundled backend: no Node/pnpm/dsh needed, splash progress, instant after first init; three launch entries (Desktop / Start Menu / install folder) |
 | `create-shortcut.cmd` (root) | Create the desktop shortcut any time (whale icon, correct for your extraction path) |
 | `bin\dsh-desktop.cmd` | One-click launcher: `dsh web` + auto window (extra args allowed, e.g. `--port 3180`); auto-registers on first run |
 | `/desktop` in the web UI | Open/reuse the desktop window for the current backend |
