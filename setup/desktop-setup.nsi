@@ -78,6 +78,11 @@ Section "Install" SecInstall
   CreateShortcut "$SMPROGRAMS\${APP_NAME}\${APP_NAME}.lnk" "$INSTDIR\electron\electron.exe" '"$INSTDIR\main.cjs"' "$INSTDIR\bin\dsh-desktop.ico"
   CreateShortcut "$SMPROGRAMS\${APP_NAME}\Uninstall.lnk" "$INSTDIR\Uninstall.exe" "" "$INSTDIR\bin\dsh-desktop.ico"
 
+  ; In-install launcher: an explicit double-click entry right inside the app
+  ; folder, so the install dir always has an obvious way to start the app
+  ; (in addition to the Desktop and Start Menu shortcuts).
+  CreateShortcut "$INSTDIR\${APP_NAME}.lnk" "$WINDIR\System32\wscript.exe" '"$INSTDIR\bin\launch-hidden.vbs"' "$INSTDIR\bin\dsh-desktop.ico"
+
   ; Uninstall entry
   WriteUninstaller "$INSTDIR\Uninstall.exe"
   WriteRegStr HKCU "${UNINST_KEY}" "DisplayName" "${APP_NAME}"
