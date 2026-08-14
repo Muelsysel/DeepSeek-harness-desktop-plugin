@@ -32,7 +32,7 @@ Install location: `%LOCALAPPDATA%\Programs\DeepSeek-Harness-Desktop` (no spaces)
 
 1. Download `DeepSeek-harness-desktop-plugin-<version>.zip` and extract it (Node.js ≥ 22.19 **required**; pnpm is auto-installed during registration)
 2. **Shortcut, no scripts**: the zip root already contains "`DeepSeek Harness 桌面版.lnk`" — right-click it → **Send to → Desktop (create shortcut)**; from then on double-click the desktop icon to launch (first click auto-registers the plugin)
-   - If you extracted to a different location than the build path, run `create-shortcut.cmd` once instead — it creates a desktop shortcut with the correct paths for your extraction location
+   - If you extracted to a different location than the shortcut points to, run `create-shortcut.cmd` once instead — it creates a desktop shortcut with the correct paths for your extraction location
 3. Alternatively double-click root **`start.cmd`** for the guided wizard: [1/5] Node.js check → [2/5] DeepSeek Harness check (the launcher fetches dsh via `npx @deepseek-ai/dsh web` when missing) → [3/5] register plugin → [4/5] create desktop shortcut → [5/5] launch
 
 You can also skip the wizard: double-click `bin\dsh-desktop.cmd` — it auto-registers on first run, then launches instantly on every click afterwards.

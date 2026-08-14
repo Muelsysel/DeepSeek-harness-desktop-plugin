@@ -36,7 +36,7 @@ DeepSeek Harness 本身是一个浏览器端的 web UI（`dsh web`）。用户�
 15. 作为硬停机场景，我想 dsh 被强杀后窗口自动退出（孤儿看门狗），以便窗口不悬挂。
 16. 作为深色偏好用户，我想用 `theme: codex` 获得深色 Codex 皮肤，以便符合我的观感习惯。
 17. 作为无环境机器用户，我想 setup 版完全自包含运行，以便部署到未装任何开发环境的机器。
-18. 作为维护者，我想仓库精简（无开发期流程文档、无本机路径快捷方式入库争议），以便仓库干净可维护。
+18. 作为维护者，我想仓库精简（无开发期流程文档、无机器特定路径快捷方式入库争议），以便仓库干净可维护。
 
 ## Implementation Decisions
 
@@ -80,6 +80,6 @@ DeepSeek Harness 本身是一个浏览器端的 web UI（`dsh web`）。用户�
 
 - **快速恢复开发**：先读 `CONTEXT.md`（词汇）与 `docs/adr/0001..0004`（决策），再读 `AGENTS.md`（布局 + 规则 + 命令）。测试 seam 列表见上文 Testing Decisions。
 - **当前交付**：GitHub release v0.1.4 含 `DeepSeek-harness-desktop-plugin-0.1.4.zip`（插件，需 Node ≥ 22.19）与 `DeepSeek-Harness-Desktop-Setup-0.1.4.exe`（自包含安装版）。
-- **已知边界**：根目录 `DeepSeek Harness 桌面版.lnk` 指向本机构建路径（v0.1.3 起重新入库作为 zip 免脚本入口）；其他解压位置用 `create-shortcut.cmd` 重建。
+- **已知边界**：根目录 `DeepSeek Harness 桌面版.lnk` 指向打包时所在的绝对路径（v0.1.3 起重新入库作为 zip 免脚本入口）；在其他位置解压的用户用 `create-shortcut.cmd` 重建。
 - **会话持久化观察**：桌面端会话曾出现"消失"现象（调查未完成即转入收尾）——下次开发若复现，从 `$DSH_HOME/sessions` 与桌面私有 home 的 `sessions/` 目录存在性入手，对照 `dsh-session-persistence-jsonl` 的 root 配置。
 - **全局 mattskills**：35 个工程/流程技能已安装到 `~/.dsh/skills`（user-dsh 全局层，`dsh-skill-filesystem` 默认扫描），任何项目可用。仓库不再保留本地副本（`.agents/`、`.claude/`、`agent/` 已删除——全局安装后无需项目级副本）。

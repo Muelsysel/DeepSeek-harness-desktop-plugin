@@ -11,7 +11,7 @@ Development is **paused** — the last release is v0.1.4 (final). When the user 
 3. **Verify the toolchain**: `npm install` (if node_modules is missing), `npm run build`, `npm run typecheck`, `npm test` — expect 31 tests passing at the seams listed under Testing Decisions in the archive.
 4. **Confirm the environment is intact**: the mattpocock engineering skills are installed **globally** at `~/.dsh/skills` (the `user-dsh` layer `dsh-skill-filesystem` scans by default) — no project-local copies exist in this repo; reinstall globally if lost, do not re-add project copies.
 5. **Release flow for a new version**: bump the version in `package.json` + both `package-lock.json` + `apps/standalone/package.json` + its lock + `setup/desktop-setup.nsi` + `apps/standalone/backend/package-lock.json`, run `npm run build` + `npm test`, then `node scripts/package.mjs` (plugin zip) and `node scripts/make-setup.mjs` (setup exe), then `gh release create vX.Y.Z` with both artifacts.
-6. **Known edges to keep in mind**: the root `DeepSeek Harness 桌面版.lnk` points at this machine's build path (zip users at other paths must run `create-shortcut.cmd`); the desktop session-vanishing issue was observed but left unresolved (see the archive's Further Notes).
+6. **Known edges to keep in mind**: the root `DeepSeek Harness 桌面版.lnk` points at the absolute build-time path of wherever the zip was assembled (users who extract elsewhere must run `create-shortcut.cmd` once to regenerate it); the desktop session-vanishing issue was observed but left unresolved (see the archive's Further Notes).
 
 ## Layout
 

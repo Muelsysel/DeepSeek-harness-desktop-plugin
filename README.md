@@ -28,11 +28,11 @@
 
 安装位置：`%LOCALAPPDATA%\Programs\DeepSeek-Harness-Desktop`（无空格路径）。启动入口：桌面快捷方式（鲸鱼图标）、开始菜单、安装目录内的 `DeepSeek Harness Desktop.lnk`，任选其一。私有数据放在 `%APPDATA%\DeepSeek-Harness-Desktop`（不碰你的 `$DSH_HOME` profile），**关窗即退出**。
 
-### 方式二：zip 便携版（免安装，需本机 Node.js）
+### 方式二：zip 便携版（免安装，需本地 Node.js）
 
 1. 下载 `DeepSeek-harness-desktop-plugin-<版本>.zip` 并解压（需 Node.js ≥ 22.19，**必须**；pnpm 无需手动安装，注册时自动装）
 2. **快捷方式（免脚本）**：解压后根目录已带「`DeepSeek Harness 桌面版.lnk`」——右键它 → **发送到 → 桌面快捷方式**，以后双击桌面图标即可启动；第一次点击会自动注册插件再启动
-   - 若解压位置与构建路径不同，请改用 `create-shortcut.cmd`（双击一次即可按你的解压位置生成正确路径的桌面快捷方式）
+   - 若解压位置与快捷方式指向的路径不同，请改用 `create-shortcut.cmd`（双击一次即可按你的解压位置生成正确路径的桌面快捷方式）
 3. 也可以双击根目录 **`start.cmd`** 走完首次引导（[1/5] 检查 Node.js → [2/5] 检查 DeepSeek Harness（未装时 launcher 自动通过 `npx @deepseek-ai/dsh web` 获取）→ [3/5] 注册插件 → [4/5] 创建桌面快捷方式 → [5/5] 启动）
 
 也可以跳过引导：直接双击 `bin\dsh-desktop.cmd`，首次点击会自动注册插件再启动。注册过一次之后，每次点快捷方式都是秒开。
