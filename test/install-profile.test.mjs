@@ -1,10 +1,11 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { ensureProfileSkeleton } from "../scripts/install-profile.mjs";
 
 // install-profile.mjs --check is the read-only verdict the one-click
 // launcher (bin\dsh-desktop.cmd) uses to decide whether a fresh extraction
@@ -91,6 +92,23 @@ test("--check: registered + linked + built -> exit 0", () => {
     const r = check(home);
     assert.equal(r.status, 0);
     assert.match(r.stdout, /installed/);
+  } finally {
+    rmSync(home, { recursive: true, force: true });
+  }
+});
+
+test("ensureProfileSkeleton: creates the minimal profile for a fresh dsh install", () => {
+  const home = makeHome();
+  try {
+    const profile = join(home, "profiles", "web");
+    const pkgPath = join(profile, "package.json");
+    const created = ensureProfileSkeleton(profile, pkgPath, "web");
+    assert.equal(created, true);
+    assert.equal(existsSync(pkgPath), true);
+    const pkg = JSON.parse(readFileSync(pkgPath, "utf8"));
+    assert.deepEqual(pkg.dsh.profile.bundles, ["@deepseek-ai/dsh-base", "@deepseek-ai/dsh-web-app"]);
+    // idempotent: second call does not rewrite
+    assert.equal(ensureProfileSkeleton(profile, pkgPath, "web"), false);
   } finally {
     rmSync(home, { recursive: true, force: true });
   }

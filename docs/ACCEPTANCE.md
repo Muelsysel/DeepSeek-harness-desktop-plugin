@@ -8,7 +8,7 @@ Process: the mattpocock flow (`grill-me` → `to-spec` → `tdd` → `code-revie
 |---|---|
 | `npm run build` (tsc) | pass |
 | `npm run typecheck` | pass |
-| `npm test` (node --test) | 29/29 pass (seams per SPEC) |
+| `npm test` (node --test) | 30/30 pass (seams per SPEC) |
 
 ## Live verification (this machine, real dsh 0.1.0-rc.6)
 
@@ -20,7 +20,10 @@ Process: the mattpocock flow (`grill-me` → `to-spec` → `tdd` → `code-revie
 6. **Hard stop** — `taskkill /F` on the dsh process: the window self-quits via the `--parent-pid` orphan watchdog (verified).
 7. **Port safety** — launcher defaults to `--port 0` (OS-assigned), never colliding with an existing 3080.
 8. **Install/uninstall** — `scripts/install-profile.mjs` installs (`link:` + bundle append, package.json backed up) and removes (`--remove`) into `$DSH_HOME/profiles/web`; the real web profile is installed and verified.
-9. **Auto-register on first launch** — `bin\dsh-desktop.cmd` checks registration via `scripts\install-profile.mjs --check` (exit 0 ready / 1 needs install / 2 profile not created) and registers once before booting when missing (pnpm `link:` + bundle append). Verified: `--check` exit codes unit-tested; the launcher flow exercised end-to-end against a throwaway `DSH_HOME` with a stub `dsh` on PATH — unregistered profile → auto-registered then booted; already-registered profile → fast path with no re-install; missing profile → boots without touching anything.
+9. **Auto-register on first launch** — `bin\dsh-desktop.cmd` checks registration via `scripts\install-profile.mjs --check` (exit 0 ready / 1 needs install / 2 profile not created) and registers once before booting when missing (pnpm `link:` + bundle append). Verified: `--check` exit codes unit-tested; the launcher flow exercised end-to-end against a throwaway `DSH_HOME` with a stub `dsh` on PATH — unregistered profile → auto-registered then booted; already-registered profile → fast path with no re-install; missing profile → the installer creates the minimal skeleton (bundles `dsh-base` + `dsh-web-app`) and registers, so a brand-new machine opens the window on the very first click.
+10. **First-run wizard** — root `start.cmd` walks `[1/5]` Node check → `[2/5]` DeepSeek Harness check/global install → `[3/5]` register → `[4/5]` Desktop shortcut (skipped with `noshortcut`) → `[5/5]` launch. E2E-verified headlessly (stub `dsh`, temp `DSH_HOME`): steps print in order, registration completes, launch fires.
+11. **Setup installer (NSIS)** — `setup\desktop-setup.nsi` + `scripts\make-setup.mjs` (compiler bundled under gitignored `tools/`). Silent-install round-trip verified on this machine: `/S /D=<temp>` installs the full tree (`bin/`, `scripts/`, `node_modules/electron`, `start.cmd`, whale `bin\dsh-desktop.ico`; payload expanded, `payload.zip` removed) in ~14 s, creates the Desktop shortcut (Chinese name, whale icon via `make-shortcut.ps1`), Start Menu entries and the `dev.dsh.desktop` uninstall entry; `/S` uninstall removes the tree, both shortcut sets and the registry entry (with `DSH_HOME` pointed at a temp dir so the real profile is untouched).
+12. **Official icon everywhere** — window + taskbar icon set in the Electron shell (`desktop\main.cjs` BrowserWindow `icon` + `app.setAppUserModelId`); shortcut, Start Menu, installer and uninstaller all carry `bin\dsh-desktop.ico` (official DeepSeek whale). The cancelled standalone exe (ADR-0004) is no longer built or shipped.
 
 ## Standalone app (ADR-0004) — live verification (this machine, portable exe)
 
@@ -59,5 +62,5 @@ Verdict: contract substantially met — every deliverable and all five spec seam
 
 - Plugin installed into the real `web` profile (`dsh.profile.bundles` includes `dsh-desktop`; `package.json.bak` backup exists).
 - Main-UI screenshot: `docs/screenshot.png`.
-- Distribution artifacts (gitignored `dist/`): `DeepSeek-harness-desktop-plugin-0.1.0.zip` (~149 MB, offline plugin install) and `exe/DeepSeek-Harness-Desktop-0.1.0.exe` (~110 MB portable standalone), both published on the GitHub release `v0.1.0`.
-- Repo: commits `7b3d3dd`..`e253fbd` on `master`.
+- Distribution artifacts (gitignored `dist/`): `DeepSeek-harness-desktop-plugin-0.1.1.zip` (~149 MB offline plugin zip) and `DeepSeek-Harness-Desktop-Setup-0.1.1.exe` (~150 MB NSIS setup installer), both on the GitHub release `v0.1.1`. The standalone portable exe is cancelled (not shipped).
+- Repo: commits `7b3d3dd`..`HEAD` on `master`.

@@ -35,9 +35,9 @@ set "ROOT=%~dp0.."
 
 rem --- auto-register: the desktop window only opens when dsh-desktop is in
 rem the booted profile's bundles. A fresh zip extraction isn't registered
-rem yet, so register it once before booting. --check exits 0 when ready,
-rem 1 when install is needed, 2 when the profile is not created yet - the
-rem first-ever boot creates it, and the next click registers.
+rem yet, so register it once before booting. --check exits 0 when ready or
+rem 1/2 when registration is missing - including when the profile does not
+rem exist yet, which the installer creates (minimal skeleton) on the spot.
 rem NOTE: no parentheses inside the block below - cmd parses them as block
 rem delimiters even inside rem/echo text.
 where node >nul 2>nul
@@ -50,7 +50,6 @@ if not errorlevel 1 (
     popd
   )
   node "%ROOT%\scripts\install-profile.mjs" --check >nul 2>nul
-  if errorlevel 2 goto :boot
   if errorlevel 1 (
     echo [dsh-desktop] registering into the web profile - one-time - ...
     node "%ROOT%\scripts\install-profile.mjs"

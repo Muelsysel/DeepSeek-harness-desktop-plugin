@@ -1,6 +1,6 @@
 {
   "name": "dsh-desktop",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "DeepSeek Harness desktop plugin: a click-to-launch, Codex-like native window over the dsh web UI. Everything is a plugin — this one is the window.",
   "type": "module",
   "main": "lib/index.js",

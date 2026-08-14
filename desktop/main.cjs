@@ -52,6 +52,12 @@ if (!opts.url) {
   app.exit(1);
 }
 
+// Official DeepSeek whale icon for the window title bar and the taskbar
+// button (the spawned electron.exe itself ships the generic Electron icon).
+// The package ships bin/dsh-desktop.ico; fall back gracefully when absent.
+const WINDOW_ICON = path.join(__dirname, '..', 'bin', 'dsh-desktop.ico');
+app.setAppUserModelId('dev.dsh.desktop');
+
 // Debug log: only written when DSH_DESKTOP_DEBUG is set. stdio of a
 // plugin-spawned window is /dev/null, so file logging is the only way to
 // see what happened inside the shell.
@@ -126,6 +132,7 @@ function createWindow() {
   const isCodex = opts.theme === 'codex';
   win = new BrowserWindow({
     title: opts.title,
+    icon: fs.existsSync(WINDOW_ICON) ? WINDOW_ICON : undefined,
     width: opts.width,
     height: opts.height,
     minWidth: 320,

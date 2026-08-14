@@ -23,7 +23,7 @@
  * by DSH_DESKTOP_LAUNCH so `dsh web` stays browser-first by default.
  */
 import { execFileSync } from "node:child_process";
-import { existsSync, readFileSync, writeFileSync, copyFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync, copyFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -111,6 +111,32 @@ function checkInstalled(profile, packageJsonPath) {
   process.exitCode = ready ? 0 : 1;
 }
 
+/**
+ * Create the minimal web-profile skeleton when the profile does not exist
+ * yet (a brand-new dsh install). Same shape the standalone app writes:
+ * dsh fills in its own bundle dependencies on first boot. Exporting this
+ * keeps it unit-testable without running pnpm.
+ */
+export function ensureProfileSkeleton(profile, packageJsonPath, profileName) {
+  if (!existsSync(profile)) mkdirSync(profile, { recursive: true });
+  if (existsSync(packageJsonPath)) return false;
+  writeFileSync(
+    packageJsonPath,
+    `${JSON.stringify(
+      {
+        name: `dsh-profile-${profileName}`,
+        private: true,
+        dependencies: {},
+        dsh: { profile: { bundles: ["@deepseek-ai/dsh-base", "@deepseek-ai/dsh-web-app"] } },
+      },
+      null,
+      2,
+    )}\n`,
+    "utf8",
+  );
+  return true;
+}
+
 function main() {
   const args = parseArgs(process.argv.slice(2));
   if (args.help) {
@@ -127,12 +153,9 @@ function main() {
     return;
   }
 
-  if (!existsSync(profile)) {
-    throw new Error(`profile directory not found: ${profile} (set DSH_HOME if needed)`);
-  }
-  if (!existsSync(packageJsonPath)) {
-    throw new Error(`profile has no package.json: ${packageJsonPath}`);
-  }
+  // Install path: a brand-new dsh install has no profile yet. Create the
+  // skeleton so registration works before the first `dsh web` boot.
+  ensureProfileSkeleton(profile, packageJsonPath, args.profile);
 
   if (args.remove) {
     console.log(`removing dsh-desktop from profile "${args.profile}" (${profile}) ...`);

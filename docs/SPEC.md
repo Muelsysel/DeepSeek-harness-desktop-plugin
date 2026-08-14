@@ -13,19 +13,20 @@ DeepSeek Harness runs as a web UI in the browser. The user wants a desktop-plugi
    - Registers the `/desktop` human command: opens (or reuses) the desktop window at the live `http://127.0.0.1:<webServer.port>` URL.
    - `autoOpen` config: opens the window at boot. Default `false`; the bundle row arms it from `DSH_DESKTOP_LAUNCH=1`.
    - Config surface: `autoOpen`, `title`, `width`, `height`, `theme` (`codex` | `default`), `electronArgs`.
-2. **Electron shell** (`desktop/`): `main.cjs` (window, load-with-retry, single instance per port, external links → system browser), `preload.cjs`, `codex.css` (Codex skin via `--dsw-*` token overrides).
+2. **Electron shell** (`desktop/`): `main.cjs` (window, load-with-retry, single instance per port, external links → system browser, official DeepSeek whale icon on the window + taskbar), `preload.cjs`, `codex.css` (Codex skin via `--dsw-*` token overrides).
 3. **Bundle patch** (`patch/desktop.bundle.yml`): inserts the `desktop` row.
 4. **Installer** (`scripts/install-profile.mjs`, `bin/install.cmd`): installs the package into the web profile and appends it to `dsh.profile.bundles` (backup before edit).
-5. **One-click launcher** (`bin/dsh-desktop.cmd`): boots the web profile with auto-open armed; on first launch it auto-registers the plugin into the booted profile if missing (`scripts\install-profile.mjs --check`: exit 0 ready / 1 needs install / 2 profile not created yet), so a fresh zip extraction is click-to-use without running `bin\install.cmd` first; `bin/uninstall.cmd` removes it.
-6. **Docs**: `CONTEXT.md`, `docs/grill.md`, `docs/SPEC.md`, `docs/adr/0001..0004`, `README.md`, `AGENTS.md`.
-7. **Standalone packaged app** (`apps/standalone/`, ADR-0004): a portable Electron exe that bundles the dsh backend and opens the same Codex-like window over a private profile under `%APPDATA%\DeepSeek-Harness-Desktop`. Closing the window stops the backend. Built by `apps/standalone/scripts/build-backend.mjs` + `electron-builder --win portable` → `dist/exe/DeepSeek-Harness-Desktop-<ver>.exe`. No Node/pnpm/profile setup.
-   - **Startup splash** (`splash.html` + `icon.png`): a frameless 440×300 window shows progress while booting — profile/dependency install (6–30%), backend boot (animated 30–75%), UI load (80%) — then hands off to the main window (100%) once the UI is ready to show. First-run dependency copy reports per-file progress; symlinks are dereferenced (a junction to the portable temp extraction would dangle on the next run). Closing the splash before handoff cancels startup.
+5. **One-click launcher** (`bin/dsh-desktop.cmd`): boots the web profile with auto-open armed; on first launch it auto-registers the plugin into the booted profile if missing (`scripts\install-profile.mjs --check`: exit 0 ready / 1 needs install / 2 profile not created yet — the installer creates a minimal profile skeleton on the spot, so a brand-new machine works on the very first click), so a fresh zip extraction is click-to-use without running `bin\install.cmd` first; `bin/uninstall.cmd` removes it.
+6. **First-run wizard + root entry points** (`start.cmd`, `create-shortcut.cmd` at the repo/zip root): guided setup `[1/5]` Node check → `[2/5]` DeepSeek Harness (dsh CLI) check/global install → `[3/5]` plugin registration → `[4/5]` Desktop shortcut (optional, whale icon; `noshortcut` arg skips it) → `[5/5]` launch. `create-shortcut.cmd` re-creates the Desktop shortcut any time.
+7. **Setup installer** (`setup/desktop-setup.nsi` + `scripts/make-setup.mjs`, NSIS, MUI2, SimpChinese/English): installs the package to `%LOCALAPPDATA%\Programs\DeepSeek Harness Desktop` (no admin), expands the payload, creates Desktop + Start Menu shortcuts with the official icon, registers an uninstall entry, and runs the first-run wizard on finish. Built by the NSIS compiler bundled under `tools/` (gitignored; fetched from electron-builder-binaries).
+8. **Docs**: `CONTEXT.md`, `docs/grill.md`, `docs/SPEC.md`, `docs/adr/0001..0004`, `README.md`, `AGENTS.md`.
+9. ~~**Standalone packaged app**~~ — **cancelled** (replaced by the setup installer, deliverable 7). The code remains in `apps/standalone/` (incl. the startup splash: a frameless 440×300 window showing dependency-install/backend-boot/UI-load progress before handoff) but it is no longer built or shipped.
 
 ## Non-goals
 
 - No reimplementation of harness features — the window loads the live profile.
 - No client-side UI plugin/button (the `/desktop` command covers in-UI launch).
-- The plugin itself is not a bundled app — it stays a plugin + launcher; the standalone exe (deliverable 7, ADR-0004) is a separate, self-contained delivery for non-developer users.
+- The plugin itself is not a bundled app — it stays a plugin + launcher + setup installer; the standalone portable exe (ADR-0004) was cancelled in favor of the setup installer.
 - No file:// + IPC transport (not shipped by dsh).
 
 ## Acceptance criteria
@@ -35,8 +36,8 @@ DeepSeek Harness runs as a web UI in the browser. The user wants a desktop-plugi
 3. `/desktop` while a window is open reuses it (no second window).
 4. Closing the window does not kill the dsh backend; stopping dsh kills the window.
 5. A plain `dsh web` (no env flag) opens no window and keeps the browser flow.
-6. The standalone exe boots the bundled backend and opens exactly one window on the live UI (Codex skin, dark); closing the window stops the backend and exits; it never touches `$DSH_HOME` profiles (private `%APPDATA%` home).
-7. On launch the standalone shows a frameless splash with a progress bar (dependency install → backend boot → UI load) and hands off to the main window once the UI is ready; closing the splash before handoff cancels startup.
+6. The launcher works from a fresh extraction: first click auto-registers the plugin (creating the profile skeleton when none exists) and opens the window; the window carries the official DeepSeek whale icon.
+7. The setup installer installs to `%LOCALAPPDATA%`, creates whale-icon shortcuts and an uninstall entry, and the first-run wizard installs DeepSeek Harness when missing, registers the plugin, and launches.
 
 ## Seams under test (confirmed with tdd)
 
