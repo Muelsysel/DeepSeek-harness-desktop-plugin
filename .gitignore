@@ -7,3 +7,9 @@ dist/
 .env.local
 scratch/
 *.tsbuildinfo
+
+# local agent skills (installed via setup-matt-pocock-skills; local only, never uploaded)
+.agents/
+.claude/
+agent/
+skills-lock.json
