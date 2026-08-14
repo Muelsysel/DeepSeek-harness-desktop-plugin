@@ -25,20 +25,31 @@ echo    DeepSeek Harness Desktop - first-run setup
 echo  ================================================================
 echo.
 
-rem ---------- 1) Node.js ----------
+rem ---------- 1) Node.js (required: 22 or newer) ----------
 echo  [1/5] Checking Node.js ...
 where node >nul 2>nul
 if errorlevel 1 (
-  echo        Node.js not found. DeepSeek Harness runs on Node.js.
-  echo        Install a recent Node.js LTS from:  https://nodejs.org
-  echo        The dsh web UI declares Node ^>= 22.19 through one of its
-  echo        dependencies - newer Node versions are recommended, but the
-  echo        plugin itself has no Node version requirement.
+  echo        Node.js not found. DeepSeek Harness requires Node.js 22 or
+  echo        newer - the web UI stack declares 22.19+.
+  echo        Install it from:  https://nodejs.org
   echo        Then run this file again.
   pause
   exit /b 1
 )
 for /f "delims=" %%v in ('node --version') do set "NODE_VER=%%v"
+if not defined NODE_VER (
+  echo        Could not read the Node.js version - is the install healthy?
+  pause
+  exit /b 1
+)
+for /f "tokens=1 delims=." %%m in ("%NODE_VER:~1%") do set "NODE_MAJOR=%%m"
+if %NODE_MAJOR% LSS 22 (
+  echo        Node.js %NODE_VER% is too old - DeepSeek Harness requires
+  echo        Node.js 22 or newer.
+  echo        Upgrade from:  https://nodejs.org  then run this file again.
+  pause
+  exit /b 1
+)
 echo        Node.js %NODE_VER% - OK
 echo.
 
@@ -49,21 +60,11 @@ if not errorlevel 1 (
   for /f "delims=" %%v in ('dsh --version 2^>nul') do set "DSH_VER=%%v"
   echo        DeepSeek Harness %DSH_VER% - already installed
 ) else (
-  echo        Not found. Installing it globally now - this needs internet
-  echo        and takes a few minutes on the first run.
-  call npm install -g @deepseek-ai/dsh
-  if errorlevel 1 (
-    echo.
-    echo        Install failed. Check your network or npm registry, then
-    echo        run this file again, or install manually with:
-    echo          npm install -g @deepseek-ai/dsh
-    echo.
-    echo        Tip: the launcher can also fetch dsh automatically on first
-    echo        launch, but that first start is much slower.
-    pause
-    exit /b 1
-  )
-  echo        DeepSeek Harness installed.
+  echo        Not found. DeepSeek Harness is used via npx:
+  echo          npx @deepseek-ai/dsh web
+  echo        The launcher runs this automatically on first launch - npx
+  echo        downloads dsh into its cache once, then starts are fast.
+  echo        No manual install needed.
 )
 echo.
 

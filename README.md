@@ -28,10 +28,10 @@
 
 ### 方式二：zip 便携版（免安装）
 
-1. 下载 `DeepSeek-harness-desktop-plugin-<版本>.zip` 并解压（需 Node.js ≥ 22.19，推荐新版 LTS）
+1. 下载 `DeepSeek-harness-desktop-plugin-<版本>.zip` 并解压（需 Node.js ≥ 22.19，**必须**，低于 22 无法运行）
 2. 双击根目录 **`start.cmd`**，按 [1/5]–[5/5] 完成首次设置：
    - [1/5] 检查 Node.js
-   - [2/5] 检查/安装 DeepSeek Harness（未安装会自动 `npm install -g @deepseek-ai/dsh`）
+   - [2/5] 检查 DeepSeek Harness（dsh CLI）；未安装时由 launcher 自动通过 `npx @deepseek-ai/dsh web` 获取（首次联网下载，之后秒起，无需手动安装）
    - [3/5] 注册本插件到 `$DSH_HOME\profiles\web`
    - [4/5] 创建桌面快捷方式（可选，鲸鱼图标）
    - [5/5] 启动桌面窗口
@@ -40,7 +40,7 @@
 
 ### 方式三：手动装进已有 dsh profile（进阶）
 
-前置：Node.js ≥ 22.19（dsh web UI 的运行时依赖 pi-ai 声明的最低版本；插件本身无 Node 版本要求）、pnpm。
+前置：Node.js ≥ 22.19（**必须**，低于 22 无法运行；web UI 依赖 pi-ai 声明的下限）、pnpm。
 
 ```bat
 :: 1) （可选）一次性安装到 web profile——不装也行：直接点启动，首次会自动注册
