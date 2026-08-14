@@ -29,8 +29,11 @@ rem ---------- 1) Node.js ----------
 echo  [1/5] Checking Node.js ...
 where node >nul 2>nul
 if errorlevel 1 (
-  echo        Node.js not found. DeepSeek Harness needs Node.js 22.19 or newer.
-  echo        Download and install it from:  https://nodejs.org
+  echo        Node.js not found. DeepSeek Harness runs on Node.js.
+  echo        Install a recent Node.js LTS from:  https://nodejs.org
+  echo        The dsh web UI declares Node ^>= 22.19 through one of its
+  echo        dependencies - newer Node versions are recommended, but the
+  echo        plugin itself has no Node version requirement.
   echo        Then run this file again.
   pause
   exit /b 1
