@@ -9,6 +9,8 @@ dsh-desktop is a DeepSeek Harness plugin: an Electron shell around the live dsh 
 - `desktop/main.cjs`, `desktop/preload.cjs`, `desktop/codex.css` — the Electron shell; plain CJS on purpose (the package is ESM).
 - `patch/desktop.bundle.yml` — the bundle row that mounts the plugin into a profile.
 - `scripts/install-profile.mjs`, `bin/*.cmd` — install/launch/uninstall.
+- `apps/standalone/` — the standalone packaged app (ADR-0004): own `main.cjs` (backend-owning fork of the shell), bundled `backend/` (built by `scripts/build-backend.mjs`), electron-builder config → `dist/exe/DeepSeek-Harness-Desktop-<ver>.exe`. Shares `preload.cjs` + `codex.css` with `desktop/`.
+- `scripts/package.mjs` — offline plugin zip (source + built lib + node_modules) → `dist/DeepSeek-harness-desktop-plugin-<ver>.zip`. `dist/` is gitignored build output.
 - `test/*.test.mjs` — `node --test` suites at the seams listed in `docs/SPEC.md`.
 
 ## Commands

@@ -31,3 +31,7 @@ _Avoid_: shortcut, start script
 **Window manager**:
 The single-instance tracker for the spawned Electron child: at most one live window per backend, reused across opens.
 _Avoid_: window controller, spawner
+
+**Standalone app**:
+The self-contained portable exe (`apps/standalone/` + electron-builder) that bundles the dsh backend and opens the same window over a private profile under `%APPDATA%\DeepSeek-Harness-Desktop`. It owns the backend lifecycle — closing the window stops it. The plugin delivery (above) remains the integration surface for real profiles.
+_Avoid_: standalone plugin, the exe, desktop app build

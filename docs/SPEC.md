@@ -17,13 +17,14 @@ DeepSeek Harness runs as a web UI in the browser. The user wants a desktop-plugi
 3. **Bundle patch** (`patch/desktop.bundle.yml`): inserts the `desktop` row.
 4. **Installer** (`scripts/install-profile.mjs`, `bin/install.cmd`): installs the package into the web profile and appends it to `dsh.profile.bundles` (backup before edit).
 5. **One-click launcher** (`bin/dsh-desktop.cmd`): boots the web profile with auto-open armed; `bin/uninstall.cmd` removes it.
-6. **Docs**: `CONTEXT.md`, `docs/grill.md`, `docs/SPEC.md`, `docs/adr/0001..0003`, `README.md`, `AGENTS.md`.
+6. **Docs**: `CONTEXT.md`, `docs/grill.md`, `docs/SPEC.md`, `docs/adr/0001..0004`, `README.md`, `AGENTS.md`.
+7. **Standalone packaged app** (`apps/standalone/`, ADR-0004): a portable Electron exe that bundles the dsh backend and opens the same Codex-like window over a private profile under `%APPDATA%\DeepSeek-Harness-Desktop`. Closing the window stops the backend. Built by `apps/standalone/scripts/build-backend.mjs` + `electron-builder --win portable` → `dist/exe/DeepSeek-Harness-Desktop-<ver>.exe`. No Node/pnpm/profile setup.
 
 ## Non-goals
 
 - No reimplementation of harness features — the window loads the live profile.
 - No client-side UI plugin/button (the `/desktop` command covers in-UI launch).
-- No packaged installers (.exe/.msi/.dmg) — a plugin + launcher, not a bundled app.
+- The plugin itself is not a bundled app — it stays a plugin + launcher; the standalone exe (deliverable 7, ADR-0004) is a separate, self-contained delivery for non-developer users.
 - No file:// + IPC transport (not shipped by dsh).
 
 ## Acceptance criteria
@@ -33,6 +34,7 @@ DeepSeek Harness runs as a web UI in the browser. The user wants a desktop-plugi
 3. `/desktop` while a window is open reuses it (no second window).
 4. Closing the window does not kill the dsh backend; stopping dsh kills the window.
 5. A plain `dsh web` (no env flag) opens no window and keeps the browser flow.
+6. The standalone exe boots the bundled backend and opens exactly one window on the live UI (Codex skin, dark); closing the window stops the backend and exits; it never touches `$DSH_HOME` profiles (private `%APPDATA%` home).
 
 ## Seams under test (confirmed with tdd)
 

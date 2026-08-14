@@ -1,6 +1,7 @@
-# Creates a desktop shortcut "DeepSeek Harness 桌面版" that launches the
-# desktop window hidden (no console) via bin\launch-hidden.vbs, with a
-# generated icon. Safe to re-run (overwrites).
+# Creates a desktop shortcut "DeepSeek Harness <desktop-edition>" that
+# launches the desktop window hidden (no console) via bin\launch-hidden.vbs,
+# with a generated icon. Safe to re-run (overwrites). ASCII-only source: the
+# Chinese name is built from char codes so PowerShell 5.1 never misreads it.
 $ErrorActionPreference = 'Stop'
 $repo = Split-Path -Parent $PSScriptRoot
 
@@ -29,7 +30,7 @@ Write-Host "icon: $icoPath"
 
 # --- create the shortcut ---------------------------------------------------
 $desktop = [Environment]::GetFolderPath('Desktop')
-$name = 'DeepSeek Harness ' + [char]0x684C + [char]0x9762 + [char]0x7248 + '.lnk'  # 桌面版
+$name = 'DeepSeek Harness ' + [char]0x684C + [char]0x9762 + [char]0x7248 + '.lnk'
 $lnkPath = Join-Path $desktop $name
 $ws = New-Object -ComObject WScript.Shell
 $s = $ws.CreateShortcut($lnkPath)

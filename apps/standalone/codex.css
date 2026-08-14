@@ -1,0 +1,90 @@
+/*
+ * dsh-desktop — Codex-like skin.
+ *
+ * The dsh web UI themes itself through `--dsw-*` design tokens resolved on
+ * `body[data-ds-dark-theme]`. This stylesheet re-targets the alias tokens to
+ * a GitHub-dark / Codex palette, so the desktop window reads like Codex while
+ * every DSH feature keeps working. Injected by the Electron main when
+ * `--theme=codex`: the shell appends this file as a <style> element (via
+ * executeJavaScript) and re-applies it on every committed navigation.
+ */
+
+body[data-ds-dark-theme] {
+  /* Surfaces — Codex / GitHub dark */
+  --dsw-alias-bg-base: #0d1117;
+  --dsw-alias-bg-layer-1: #161b22;
+  --dsw-alias-bg-layer-2: #1c2128;
+  --dsw-alias-bg-layer-3: #21262d;
+  --dsw-alias-bg-overlay: #161b22;
+  --dsw-alias-bg-module-platform: #0d1117;
+  --dsw-alias-bg-multi-select: #161b22;
+  --dsw-alias-bg-skeleton: #21262d;
+
+  /* Borders */
+  --dsw-alias-border-l1: #21262d;
+  --dsw-alias-border-l2: #30363d;
+  --dsw-alias-border-l3: #3d444d;
+  --dsw-alias-border-l4: #484f58;
+  --dsw-alias-border-inverted: #f0f6fc;
+
+  /* Brand / accent — Codex blue */
+  --dsw-alias-brand-primary: #5498ff;
+  --dsw-alias-brand-primary-invert: #0d1117;
+  --dsw-alias-brand-text: #6ea8ff;
+  --dsw-alias-state-business-primary: #5498ff;
+  --dsw-alias-state-business-tertiary: rgba(84, 152, 255, 0.16);
+
+  /* Labels */
+  --dsw-alias-label-primary: #f0f6fc;
+  --dsw-alias-label-primary-bluish: #e6edf3;
+  --dsw-alias-label-secondary: #9da7b3;
+  --dsw-alias-label-tertiary: #6e7681;
+  --dsw-alias-label-dimmed: #6e7681;
+  --dsw-alias-label-caption: #9da7b3;
+
+  /* Buttons */
+  --dsw-alias-button-primary-fill: #5498ff;
+  --dsw-alias-button-primary-hover: #6ea8ff;
+  --dsw-alias-button-primary-dimmed: rgba(84, 152, 255, 0.24);
+  --dsw-alias-button-info-fill: #161b22;
+  --dsw-alias-button-info-hover: #21262d;
+  --dsw-alias-button-floating-fill: #21262d;
+  --dsw-alias-button-floating-hover: #30363d;
+  --dsw-alias-button-ghost-active-fill: #21262d;
+  --dsw-alias-button-ghost-active-hover: #30363d;
+
+  /* Interactive */
+  --dsw-alias-interactive-bg-hover: #161b22;
+  --dsw-alias-interactive-bg-active: #21262d;
+  --dsw-alias-interactive-bg-hover-accent: rgba(84, 152, 255, 0.12);
+
+  /* Sidebar */
+  --dsw-specific-sidebar-fill: #0d1117;
+  --dsw-specific-sidebar-nav-item-active: #161b22;
+  --dsw-specific-sidebar-nav-item-active-accent: #5498ff;
+  --dsw-specific-sidebar-nav-item-hover: #161b22;
+
+  /* State colors */
+  --dsw-alias-state-success-primary: #3fb950;
+  --dsw-alias-state-success-secondary: rgba(63, 185, 80, 0.16);
+  --dsw-alias-state-warn-primary: #d29922;
+  --dsw-alias-state-warn-secondary: rgba(210, 153, 34, 0.16);
+  --dsw-alias-state-error-primary: #f85149;
+  --dsw-alias-state-error-secondary: rgba(248, 81, 73, 0.16);
+
+  /* Code */
+  --dsw-alias-markdown-code-block: #161b22;
+  --dsw-alias-markdown-inline-code: #1c2128;
+  --dsw-alias-markdown-tag: #30363d;
+
+  /* Scrollbars */
+  --dsw-alias-scrollbar-bg-l1: #21262d;
+  --dsw-alias-scrollbar-bg-l2: #30363d;
+  --dsw-alias-scrollbar-hover-l1: #30363d;
+  --dsw-alias-scrollbar-hover-l2: #3d444d;
+
+  /* Chrome accents */
+  --dsw-alias-tooltip-bg: #21262d;
+  --dsw-alias-hovercard-bg: #161b22;
+  --dsw-alias-toast-bg: #21262d;
+}

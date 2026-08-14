@@ -21,6 +21,15 @@ Process: the mattpocock flow (`grill-me` → `to-spec` → `tdd` → `code-revie
 7. **Port safety** — launcher defaults to `--port 0` (OS-assigned), never colliding with an existing 3080.
 8. **Install/uninstall** — `scripts/install-profile.mjs` installs (`link:` + bundle append, package.json backed up) and removes (`--remove`) into `$DSH_HOME/profiles/web`; the real web profile is installed and verified.
 
+## Standalone app (ADR-0004) — live verification (this machine, portable exe)
+
+1. **Build** — `apps/standalone/scripts/build-backend.mjs` produces the bundled backend; `electron-builder --win portable` produces `dist/exe/DeepSeek-Harness-Desktop-0.1.0.exe` (~110 MB).
+2. **First run** — the exe creates its private home under `%APPDATA%\DeepSeek-Harness-Desktop`, copies the bundled backend `node_modules` into `profiles/desktop` (one-time, ~25 s), boots `dsh web` on an OS-assigned port, and opens exactly one window; the backend URL is detected from the `dsh web: http://127.0.0.1:<port>` line (e.g. `http://127.0.0.1:60536`).
+3. **Window content** — CDP-verified in the live window: dsh UI loaded (`window.__DSH_BOOT__` present, `document.title` "DeepSeek Harness", HTTP 200), dark theme + Codex tokens (`body[data-ds-dark-theme]`, `--dsw-alias-bg-base: #0d1117`, `--dsw-alias-brand-primary: #5498ff`, body background `rgb(13,17,23)`), preload bridge present (`window.dshDesktop.isDesktop`). Screenshot: `scratch/standalone-window.png`.
+4. **Private home** — the standalone never touches `$DSH_HOME` profiles (runs under its own `%APPDATA%` home with `--port 0`).
+5. **Close stops the backend** — closing the window terminates the backend child and exits the app; the port stops answering and no dsh process remains.
+6. **Backend HMR compatibility** — the backend child runs under `ELECTRON_RUN_AS_NODE` with `--expose-internals` (the dsh CLI's loader needs Node internals for its HMR service; the `node-addon-require-builtin` fallback does not load in Electron-as-node, which first surfaced as `failed to apply loader entry … (cordis-plugin-hmr): --expose-internals is required for HMR service`).
+
 ## Code review — two axes (per the code-review skill)
 
 ### Standards

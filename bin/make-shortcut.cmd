@@ -2,9 +2,10 @@
 rem =====================================================================
 rem  dsh-desktop - create a Desktop shortcut.
 rem
-rem  Creates "DeepSeek Harness 桌面版.lnk" on the Desktop: double-click it
-rem  to open the desktop window (no console), close the window to shut
-rem  the backend down too. Re-run any time to refresh.
+rem  Creates "DeepSeek Harness <Desktop>.lnk" (Chinese: "desktop edition")
+rem  on the Desktop: double-click it to open the desktop window with no
+rem  console; closing the window also shuts the backend down. Re-run any
+rem  time to refresh.
 rem =====================================================================
 setlocal
 cd /d "%~dp0.."
