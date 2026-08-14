@@ -82,4 +82,4 @@ DeepSeek Harness 本身是一个浏览器端的 web UI（`dsh web`）。用户�
 - **当前交付**：GitHub release v0.1.3 含 `DeepSeek-harness-desktop-plugin-0.1.3.zip`（插件，需 Node ≥ 22.19）与 `DeepSeek-Harness-Desktop-Setup-0.1.3.exe`（自包含安装版）。
 - **已知边界**：根目录 `DeepSeek Harness 桌面版.lnk` 指向本机构建路径（v0.1.3 起重新入库作为 zip 免脚本入口）；其他解压位置用 `create-shortcut.cmd` 重建。
 - **会话持久化观察**：桌面端会话曾出现"消失"现象（调查未完成即转入收尾）——下次开发若复现，从 `$DSH_HOME/sessions` 与桌面私有 home 的 `sessions/` 目录存在性入手，对照 `dsh-session-persistence-jsonl` 的 root 配置。
-- **全局 mattskills**：35 个工程/流程技能已安装到 `~/.dsh/skills`（user-dsh 全局层，`dsh-skill-filesystem` 默认扫描），任何项目可用；本仓库三份副本（`.agents/`、`.claude/`、`agent/`）内容一致。
+- **全局 mattskills**：35 个工程/流程技能已安装到 `~/.dsh/skills`（user-dsh 全局层，`dsh-skill-filesystem` 默认扫描），任何项目可用。仓库不再保留本地副本（`.agents/`、`.claude/`、`agent/` 已删除——全局安装后无需项目级副本）。

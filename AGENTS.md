@@ -1,6 +1,6 @@
 # AGENTS.md
 
-dsh-desktop is a DeepSeek Harness plugin: an Electron shell around the live dsh web UI. Read `CONTEXT.md` for vocabulary before touching behavior.
+dsh-desktop is a DeepSeek Harness plugin: an Electron shell around the live dsh web UI. Read `CONTEXT.md` for vocabulary before touching behavior. Development is paused at v0.1.3 — `docs/spec-archive.md` is the state-of-play archive for resuming; architecture decisions live in `docs/adr/0001..0004`.
 
 ## Layout
 
@@ -28,3 +28,7 @@ dsh-desktop is a DeepSeek Harness plugin: an Electron shell around the live dsh 
 - The web profile's port is `ctx.webServer.port` (may be OS-assigned); never hard-code 3080 in code.
 - Every behavior change updates the seams under test; a changed hard-to-reverse decision gets an ADR.
 - Work in the mattpocock flow: grilling → spec → tickets → tdd → code-review.
+
+## Skills
+
+The mattpocock engineering skills are installed **globally** at `~/.dsh/skills` (the `user-dsh` layer `dsh-skill-filesystem` scans by default) — there are no project-local copies in this repo. They are available in every project, this one included. Re-run the installer only if the global install is lost.

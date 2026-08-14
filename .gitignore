@@ -10,9 +10,3 @@ scratch/
 
 # NSIS compiler bundle (downloaded by scripts/make-setup.mjs)
 tools/
-
-# local agent skills (installed via setup-matt-pocock-skills; local only, never uploaded)
-.agents/
-.claude/
-agent/
-skills-lock.json

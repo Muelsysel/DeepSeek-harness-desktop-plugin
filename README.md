@@ -115,7 +115,7 @@ DeepSeek Harness 桌面版.lnk  根目录快捷方式（免脚本，右键可发
 start.cmd      根目录首次引导向导（zip 版入口）
 create-shortcut.cmd  根目录一键生成桌面快捷方式
 tools/         本地 NSIS 编译器（gitignored，构建时自动下载）
-docs/          ADR 决策记录 + 截图
+docs/          ADR 决策记录 + spec-archive（开发存档）+ 截图
 ```
 
 ## License

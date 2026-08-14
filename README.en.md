@@ -116,7 +116,7 @@ DeepSeek Harness 桌面版.lnk  Root shortcut (script-free, send it to the deskt
 start.cmd      Root first-run wizard (zip entry point)
 create-shortcut.cmd  Root one-shot desktop-shortcut creator
 tools/         Local NSIS compiler (gitignored, auto-downloaded by the build)
-docs/          ADR decision records + screenshot
+docs/          ADR decision records + spec-archive (dev archive) + screenshot
 ```
 
 ## License

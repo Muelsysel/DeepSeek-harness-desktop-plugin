@@ -1,6 +1,6 @@
 # dsh-desktop Context
 
-A DeepSeek Harness plugin that puts the dsh web UI in a Codex-like native window, launched with one click.
+A DeepSeek Harness plugin that puts the dsh web UI in a Codex-like native window, launched with one click. Development paused at v0.1.3; `docs/spec-archive.md` records the state of play for resuming.
 
 ## Language
 
@@ -35,3 +35,11 @@ _Avoid_: window controller, spawner
 **Standalone app**:
 The self-contained installed app (`apps/standalone/`, packaged by `scripts/make-setup.mjs` into the NSIS setup installer) that bundles the dsh backend + Electron runtime and opens the same window over a private profile under `%APPDATA%\DeepSeek-Harness-Desktop`. It owns the backend lifecycle — closing the window stops it. No Node / pnpm / dsh is needed on the target machine. The plugin delivery (above) remains the integration surface for real profiles.
 _Avoid_: standalone plugin, the exe, desktop app build
+
+**Spec archive**:
+`docs/spec-archive.md` — the state-of-play record written when development paused (v0.1.3): problem/solution, user stories, implementation and testing decisions, out-of-scope, and resume pointers. Read it (plus `CONTEXT.md` and the ADRs) to restart development quickly.
+_Avoid_: the spec, SPEC.md (deleted), requirements doc
+
+**Global skills**:
+The mattpocock engineering skills installed at `~/.dsh/skills` (the `user-dsh` layer `dsh-skill-filesystem` scans by default) — available in every project; this repo keeps no local copies (`.agents/`, `.claude/`, `agent/` were removed after the global install).
+_Avoid_: local skills, project skills, mattskills copies
