@@ -22,7 +22,7 @@
 
 ### 方式一：安装版 setup.exe（推荐，自带后端、免环境）
 
-1. 到 [GitHub Releases](https://github.com/Muelsysel/DeepSeek-harness-desktop/releases) 下载 `DeepSeek-Harness-Desktop-Setup-<版本>.exe`
+1. 到 [GitHub Releases](https://github.com/Muelsysel/DeepSeek-Harness-Desktop/releases) 下载 `DeepSeek-Harness-Desktop-Setup-<版本>.exe`
 2. 双击安装（免管理员），安装完成自动启动
 3. **无需安装 Node.js / pnpm / DeepSeek Harness** —— 后端和 Electron 运行时全部内置；首次启动闪屏显示初始化进度，之后秒开
 

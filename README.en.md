@@ -22,7 +22,7 @@ Put DeepSeek Harness into a native desktop window: **double-click to launch**, a
 
 ### Option 1: setup.exe installer (recommended — bundled backend, no environment needed)
 
-1. Download `DeepSeek-Harness-Desktop-Setup-<version>.exe` from [GitHub Releases](https://github.com/Muelsysel/DeepSeek-harness-desktop/releases)
+1. Download `DeepSeek-Harness-Desktop-Setup-<version>.exe` from [GitHub Releases](https://github.com/Muelsysel/DeepSeek-Harness-Desktop/releases)
 2. Run it (no admin required); the app launches automatically when the install finishes
 3. **No Node.js / pnpm / DeepSeek Harness needed** — the backend and the Electron runtime are bundled; the first launch shows progress (built-in dependency init), then it opens instantly
 
