@@ -10,13 +10,12 @@ Put DeepSeek Harness into a native desktop window: **double-click to launch**, a
 
 ## Features
 
-- 🖱️ **One-click launch**: desktop shortcut / root "DeepSeek Harness 桌面版" shortcut / in-install launcher — double-click to get the window (white/light by default, dark Codex skin optional)
+- 🖱️ **One-click launch**: desktop shortcut or the in-install launcher — double-click to get the window (white/light by default, dark Codex skin optional)
 - 🪟 Native Electron window loading the live UI at `http://127.0.0.1:<port>`
 - ⌨️ Type `/desktop` in the web UI to open/reuse the window (one window per backend)
 - 🔗 External links open in the system browser
-- 🛑 **Closing the window stops the backend** (app mode); without `DSH_DESKTOP_LAUNCH`, plain `dsh web` stays browser-first
-- 🚀 **Startup splash**: an instant whale progress window (downloading dsh / booting the backend / loading the UI) hands off to the main window when ready
-- 🧭 **First-run wizard**: the setup installer guides through install → register → shortcut; the zip version walks `start.cmd` [1/5]–[5/5]
+- 🛑 **Closing the window stops the backend** (installer version); without `DSH_DESKTOP_LAUNCH`, plain `dsh web` stays browser-first
+- 🚀 **Startup splash**: an instant whale progress window (initializing the backend / loading the UI) hands off to the main window when ready
 - 🐋 Official DeepSeek whale icon everywhere (window, taskbar, shortcuts, installer)
 
 ## Getting started
@@ -32,8 +31,7 @@ Install location: `%LOCALAPPDATA%\Programs\DeepSeek-Harness-Desktop` (no spaces)
 ### Option 2: zip portable version (no install, needs local Node.js)
 
 1. Download `DeepSeek-harness-desktop-plugin-<version>.zip` and extract it (Node.js ≥ 22.19 **required**; pnpm is auto-installed during registration)
-2. **Shortcut, no scripts**: the zip root already contains "`DeepSeek Harness 桌面版.lnk`" — right-click it → **Send to → Desktop (create shortcut)**; from then on double-click the desktop icon to launch (first click auto-registers the plugin)
-   - If you extracted to a different location than the build path, run `create-shortcut.cmd` once instead — it creates a desktop shortcut with the correct paths for your extraction location
+2. Run root **`create-shortcut.cmd`** once to create the desktop shortcut (whale icon, correct paths for your extraction location)
 3. Alternatively double-click root **`start.cmd`** for the guided wizard: [1/5] Node.js check → [2/5] DeepSeek Harness check (the launcher fetches dsh via `npx @deepseek-ai/dsh web` when missing) → [3/5] register plugin → [4/5] create desktop shortcut → [5/5] launch
 
 You can also skip the wizard: double-click `bin\dsh-desktop.cmd` — it auto-registers on first run, then launches instantly on every click afterwards.
@@ -64,10 +62,9 @@ Usage summary:
 | Entry | Description |
 |---|---|
 | setup.exe installer | **Bundled backend**: no Node/pnpm/dsh needed, splash progress, instant after first init; three launch entries (Desktop / Start Menu / install folder) |
-| Root "DeepSeek Harness 桌面版.lnk" | Zip version, script-free shortcut: right-click → Send to → Desktop |
 | `start.cmd` (root) | Zip wizard: needs Node.js ≥ 22.19, guided [1/5]–[5/5] then instant |
+| `create-shortcut.cmd` (root) | Create the desktop shortcut any time (whale icon, correct for your extraction path) |
 | `bin\dsh-desktop.cmd` | One-click launcher: `dsh web` + auto window (extra args allowed, e.g. `--port 3180`); auto-registers on first run |
-| `create-shortcut.cmd` (root) | Recreate the desktop shortcut any time (whale icon, correct for your extraction path) |
 | `/desktop` in the web UI | Open/reuse the desktop window for the current backend |
 | `bin\uninstall.cmd` | Remove the plugin from the profile (package.json backed up) |
 
@@ -109,15 +106,14 @@ Dev commands: `npm run build` / `npm run typecheck` / `npm test` (`node --test`)
 src/           Plugin logic (Cordis plugin: /desktop command, auto-open, window manager)
 desktop/       Electron shell (main.cjs / preload.cjs / codex.css skin / splash.html)
 patch/         The bundle row inserted into the profile
-bin/           One-click launch / install / uninstall / shortcut scripts + official icon
+bin/           One-click launch / install / uninstall scripts + official icon
 apps/standalone/ Self-contained desktop app source (backend-owning main.cjs + bundled backend/, packaged into setup.exe)
 scripts/       Install scripts, offline packaging (package.mjs), installer build (make-setup.mjs), shortcuts (make-shortcut.ps1)
 setup/         NSIS installer script (desktop-setup.nsi)
-DeepSeek Harness 桌面版.lnk  Root shortcut (script-free, send it to the desktop)
 start.cmd      Root first-run wizard (zip entry point)
 create-shortcut.cmd  Root one-shot desktop-shortcut creator
 tools/         Local NSIS compiler (gitignored, auto-downloaded by the build)
-docs/          SPEC / ADR / ACCEPTANCE / grill decision records
+docs/          ADR decision records + screenshot
 ```
 
 ## License

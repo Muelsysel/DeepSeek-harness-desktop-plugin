@@ -1,10 +1,10 @@
 # 0004 — Standalone packaged app for non-developer users
 
-> **Superseded (delivery shape)**: the *portable exe* distribution was cancelled; the standalone technology was **revived as the NSIS setup installer's payload** — `scripts/make-setup.mjs` now packages `apps/standalone/` (bundled backend + Electron runtime) into `dist/DeepSeek-Harness-Desktop-Setup-<ver>.exe` (`docs/SPEC.md` deliverable 7). The decision below remains the record of the original choice.
+> **Superseded (delivery shape)**: the *portable exe* distribution was cancelled; the standalone technology was **revived as the NSIS setup installer's payload** — `scripts/make-setup.mjs` now packages `apps/standalone/` (bundled backend + Electron runtime) into `dist/DeepSeek-Harness-Desktop-Setup-<ver>.exe`. The decision below remains the record of the original choice.
 
-The plugin+launcher delivery (`docs/SPEC.md` deliverables 1-6) needs a working dsh install, a profile, and a pnpm step. For a non-developer, "double-click one thing and get a window" means a self-contained build. Decision: a **standalone packaged app** — an Electron portable exe that bundles the dsh backend, owns a private DSH home, and opens the same Codex-like window, with no Node/pnpm/profile setup.
+The plugin+launcher delivery (plugin package, bundle patch, installer scripts, one-click launcher) needs a working dsh install, a profile, and a pnpm step. For a non-developer, "double-click one thing and get a window" means a self-contained build. Decision: a **standalone packaged app** — an Electron portable exe that bundles the dsh backend, owns a private DSH home, and opens the same Codex-like window, with no Node/pnpm/profile setup.
 
-This supersedes SPEC's original non-goal "no packaged installers (.exe/.msi/.dmg) — a plugin + launcher, not a bundled app", which was written for the plugin deliverable. Both deliveries now exist and share the same shell assets (`desktop/main.cjs` logic, `preload.cjs`, `codex.css`).
+This supersedes the original non-goal "no packaged installers (.exe/.msi/.dmg) — a plugin + launcher, not a bundled app", which was written for the plugin deliverable. Both deliveries now exist and share the same shell assets (`desktop/main.cjs` logic, `preload.cjs`, `codex.css`).
 
 ## Shape
 

@@ -1,6 +1,6 @@
 # AGENTS.md
 
-dsh-desktop is a DeepSeek Harness plugin: an Electron shell around the live dsh web UI. Read `CONTEXT.md` for vocabulary and `docs/grill.md` for the decisions before touching behavior.
+dsh-desktop is a DeepSeek Harness plugin: an Electron shell around the live dsh web UI. Read `CONTEXT.md` for vocabulary before touching behavior.
 
 ## Layout
 
@@ -11,7 +11,7 @@ dsh-desktop is a DeepSeek Harness plugin: an Electron shell around the live dsh 
 - `scripts/install-profile.mjs`, `bin/*.cmd`, `start.cmd`, `create-shortcut.cmd` — install/launch/uninstall/shortcut helpers.
 - `apps/standalone/` — the self-contained packaged app (ADR-0004): own `main.cjs` (backend-owning fork of the shell), bundled `backend/` (built by `scripts/build-backend.mjs`), shared `preload.cjs` + `codex.css`. `scripts/make-setup.mjs` assembles it into the NSIS setup installer → `dist/DeepSeek-Harness-Desktop-Setup-<ver>.exe`.
 - `scripts/package.mjs` — offline plugin zip (source + built lib + node_modules) → `dist/DeepSeek-harness-desktop-plugin-<ver>.zip`. `dist/` is gitignored build output.
-- `test/*.test.mjs` — `node --test` suites at the seams listed in `docs/SPEC.md`.
+- `test/*.test.mjs` — `node --test` suites at the logic seams in `src/desktop.ts`.
 
 ## Commands
 
@@ -26,5 +26,5 @@ dsh-desktop is a DeepSeek Harness plugin: an Electron shell around the live dsh 
 - Never import `electron` at plugin runtime — only resolve its binary path and spawn it. The window must die with the profile, never hold it open.
 - Test through `WindowManager`'s injected `spawn` — never spawn real Electron in unit tests.
 - The web profile's port is `ctx.webServer.port` (may be OS-assigned); never hard-code 3080 in code.
-- Every behavior change updates `docs/SPEC.md` and the seams under test; a changed hard-to-reverse decision gets an ADR.
-- Work in the mattpocock flow: grilling → spec → tickets → tdd → code-review. `docs/grill.md` and `docs/SPEC.md` are the current source of truth.
+- Every behavior change updates the seams under test; a changed hard-to-reverse decision gets an ADR.
+- Work in the mattpocock flow: grilling → spec → tickets → tdd → code-review.
