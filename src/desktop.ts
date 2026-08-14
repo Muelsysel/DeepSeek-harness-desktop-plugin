@@ -15,7 +15,7 @@ export interface WindowOptions {
   readonly width: number;
   /** Initial inner height in CSS pixels. */
   readonly height: number;
-  /** `codex` applies the Codex-like skin; `default` keeps the stock UI. */
+  /** `default` keeps the stock light (white) UI; `codex` applies the dark Codex skin. */
   readonly theme: "codex" | "default";
   /** Extra argv passed to the Electron binary before the main script. */
   readonly electronArgs: string[];

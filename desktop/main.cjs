@@ -4,12 +4,13 @@
  * dsh-desktop Electron main.
  *
  * Spawned by the dsh-desktop plugin as:
- *   electron.exe main.cjs --url=http://127.0.0.1:<port> [--title=...] [--theme=codex] [--size=WxH]
+ *   electron.exe main.cjs --url=http://127.0.0.1:<port> [--title=...] [--theme=default] [--size=WxH]
  *
- * It opens one BrowserWindow hosting the live dsh web UI, applies the
- * Codex-like skin when asked, keeps external links in the system browser, and
- * retries the load until the backend answers (the window often boots before
- * the server has finished binding its routes).
+ * It opens one BrowserWindow hosting the live dsh web UI in the light
+ * (white) look by default, applies the dark Codex-like skin when
+ * `--theme=codex`, keeps external links in the system browser, and retries
+ * the load until the backend answers (the window often boots before the
+ * server has finished binding its routes).
  */
 
 const { app, BrowserWindow, shell, nativeTheme } = require('electron');
@@ -21,7 +22,7 @@ function parseArgs(argv) {
   const out = {
     url: undefined,
     title: 'DeepSeek Harness',
-    theme: 'codex',
+    theme: 'default',
     width: 1280,
     height: 800,
     parentPid: 0,
@@ -94,6 +95,9 @@ if (isSplash) {
 
 if (opts.theme === 'codex') {
   nativeTheme.themeSource = 'dark';
+} else {
+  // Default look is the light (white) UI; `--theme=codex` opts into dark.
+  nativeTheme.themeSource = 'light';
 }
 
 // ---------------------------------------------------------------------------
@@ -126,7 +130,7 @@ function createSplashWindow() {
     resizable: false,
     show: false,
     icon: fs.existsSync(WINDOW_ICON) ? WINDOW_ICON : undefined,
-    backgroundColor: '#0d1117',
+    backgroundColor: '#ffffff',
     webPreferences: {
       contextIsolation: true,
       nodeIntegration: false,

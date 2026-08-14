@@ -8,7 +8,7 @@ Process: the mattpocock flow (`grill-me` → `to-spec` → `tdd` → `code-revie
 |---|---|
 | `npm run build` (tsc) | pass |
 | `npm run typecheck` | pass |
-| `npm test` (node --test) | 30/30 pass (seams per SPEC) |
+| `npm test` (node --test) | 31/31 pass (seams per SPEC) |
 
 ## Live verification (this machine, real dsh 0.1.0-rc.6)
 
@@ -65,5 +65,11 @@ Verdict: contract substantially met — every deliverable and all five spec seam
 
 - Plugin installed into the real `web` profile (`dsh.profile.bundles` includes `dsh-desktop`; `package.json.bak` backup exists).
 - Main-UI screenshot: `docs/screenshot.png`.
-- Distribution artifacts (gitignored `dist/`): `DeepSeek-harness-desktop-plugin-0.1.1.zip` (~149 MB offline plugin zip) and `DeepSeek-Harness-Desktop-Setup-0.1.1.exe` (~150 MB NSIS setup installer), both on the GitHub release `v0.1.1`. The standalone portable exe is cancelled (not shipped).
-- Repo: commits `7b3d3dd`..`HEAD` on `master`.
+- Distribution artifacts (gitignored `dist/`): `DeepSeek-harness-desktop-plugin-<ver>.zip` (offline plugin zip) and `DeepSeek-Harness-Desktop-Setup-<ver>.exe` (NSIS setup installer), published on GitHub Releases. The standalone portable exe is cancelled (not shipped).
+- Repo: commits on `master`.
+
+## v0.1.2 changes (this round)
+
+- **Installed-app launcher fixed**: the desktop/Start-Menu launchers now resolve the bundled Electron runtime at `electron\electron.exe` (`apps/standalone/bin/launch-hidden.vbs` and the NSIS Start Menu shortcut); the setup payload ships `bin\launch-hidden.vbs` so the shortcut no longer reports a missing launcher.
+- **Default look is now white**: the plugin shell and the standalone app default to the light (white) UI (`nativeTheme.themeSource = 'light'`, white window/splash backgrounds); `theme: codex` opts into the dark Codex skin, which also gained a matching light palette (`codex.css`). `Config.theme` default changed `codex` → `default`.
+- **Architecture cleanup**: the cancelled portable-exe path was removed (`electron-builder` config and `build:exe` from `apps/standalone/package.json`); the dead electron-builder layout branch was dropped from `apps/standalone/main.cjs`'s backend resolution; README/docs updated to match.

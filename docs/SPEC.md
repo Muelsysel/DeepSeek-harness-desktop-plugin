@@ -32,7 +32,7 @@ DeepSeek Harness runs as a web UI in the browser. The user wants a desktop-plugi
 ## Acceptance criteria
 
 1. `npm run build` and `npm test` pass (unit tests at the logic seams).
-2. With the plugin mounted in a web profile and `DSH_DESKTOP_LAUNCH=1`, booting the profile opens exactly one Electron window, the window shows the dsh UI (Codex skin applied, dark), and the UI is fully interactive (session composer reachable).
+2. With the plugin mounted in a web profile and `DSH_DESKTOP_LAUNCH=1`, booting the profile opens exactly one Electron window, the window shows the dsh UI in the default light (white) look, and the UI is fully interactive (session composer reachable). `theme: codex` opts into the dark Codex skin instead.
 3. `/desktop` while a window is open reuses it (no second window).
 4. Closing the window does not kill the dsh backend; stopping dsh kills the window.
 5. A plain `dsh web` (no env flag) opens no window and keeps the browser flow.

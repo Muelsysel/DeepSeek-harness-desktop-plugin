@@ -40,7 +40,7 @@ export const Config: z<Config> = z.object({
   title: z.string().default("DeepSeek Harness"),
   width: z.natural().min(320).default(1280),
   height: z.natural().min(240).default(800),
-  theme: z.union([z.const("codex"), z.const("default")]).default("codex"),
+  theme: z.union([z.const("codex"), z.const("default")]).default("default"),
   electronArgs: z.array(z.string()).default([]),
 });
 

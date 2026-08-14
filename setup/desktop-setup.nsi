@@ -14,7 +14,7 @@
 !include "MUI2.nsh"
 
 !ifndef APP_VERSION
-  !define APP_VERSION "0.1.1"
+  !define APP_VERSION "0.1.2"
 !endif
 !define APP_NAME "DeepSeek Harness Desktop"
 !define APP_ID "dev.dsh.desktop"
@@ -73,9 +73,9 @@ Section "Install" SecInstall
   nsExec::ExecToLog 'powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$INSTDIR\scripts\make-shortcut.ps1"'
   Pop $0
 
-  ; Start Menu shortcuts
+  ; Start Menu shortcuts (the Electron runtime is bundled under electron\)
   CreateDirectory "$SMPROGRAMS\${APP_NAME}"
-  CreateShortcut "$SMPROGRAMS\${APP_NAME}\${APP_NAME}.lnk" "$INSTDIR\electron.exe" '"$INSTDIR\main.cjs"' "$INSTDIR\bin\dsh-desktop.ico"
+  CreateShortcut "$SMPROGRAMS\${APP_NAME}\${APP_NAME}.lnk" "$INSTDIR\electron\electron.exe" '"$INSTDIR\main.cjs"' "$INSTDIR\bin\dsh-desktop.ico"
   CreateShortcut "$SMPROGRAMS\${APP_NAME}\Uninstall.lnk" "$INSTDIR\Uninstall.exe" "" "$INSTDIR\bin\dsh-desktop.ico"
 
   ; Uninstall entry

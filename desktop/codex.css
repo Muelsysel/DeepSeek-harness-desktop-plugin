@@ -3,12 +3,97 @@
  *
  * The dsh web UI themes itself through `--dsw-*` design tokens resolved on
  * `body[data-ds-dark-theme]`. This stylesheet re-targets the alias tokens to
- * a GitHub-dark / Codex palette, so the desktop window reads like Codex while
- * every DSH feature keeps working. Injected by the Electron main when
- * `--theme=codex`: the shell appends this file as a <style> element (via
- * executeJavaScript) and re-applies it on every committed navigation.
+ * the Codex palettes — light (white) by default, GitHub-dark when the UI is
+ * in dark mode — so the desktop window reads like Codex while every DSH
+ * feature keeps working. Injected by the Electron main: the shell appends
+ * this file as a <style> element (via executeJavaScript) and re-applies it
+ * on every committed navigation.
  */
 
+/* Light / white palette — the default look. The UI carries no
+   `data-ds-dark-theme` attribute in light mode. */
+body:not([data-ds-dark-theme]) {
+  /* Surfaces — white / GitHub light */
+  --dsw-alias-bg-base: #ffffff;
+  --dsw-alias-bg-layer-1: #f6f8fa;
+  --dsw-alias-bg-layer-2: #eef1f4;
+  --dsw-alias-bg-layer-3: #e6ebf0;
+  --dsw-alias-bg-overlay: #f6f8fa;
+  --dsw-alias-bg-module-platform: #ffffff;
+  --dsw-alias-bg-multi-select: #f6f8fa;
+  --dsw-alias-bg-skeleton: #e6ebf0;
+
+  /* Borders */
+  --dsw-alias-border-l1: #d0d7de;
+  --dsw-alias-border-l2: #d8dee4;
+  --dsw-alias-border-l3: #c8d1d9;
+  --dsw-alias-border-l4: #b6c0ca;
+  --dsw-alias-border-inverted: #0d1117;
+
+  /* Brand / accent — DeepSeek blue */
+  --dsw-alias-brand-primary: #5498ff;
+  --dsw-alias-brand-primary-invert: #ffffff;
+  --dsw-alias-brand-text: #2f6fd6;
+  --dsw-alias-state-business-primary: #5498ff;
+  --dsw-alias-state-business-tertiary: rgba(84, 152, 255, 0.14);
+
+  /* Labels */
+  --dsw-alias-label-primary: #1f2328;
+  --dsw-alias-label-primary-bluish: #24292f;
+  --dsw-alias-label-secondary: #57606a;
+  --dsw-alias-label-tertiary: #6e7781;
+  --dsw-alias-label-dimmed: #6e7781;
+  --dsw-alias-label-caption: #57606a;
+
+  /* Buttons */
+  --dsw-alias-button-primary-fill: #5498ff;
+  --dsw-alias-button-primary-hover: #3b82f6;
+  --dsw-alias-button-primary-dimmed: rgba(84, 152, 255, 0.22);
+  --dsw-alias-button-info-fill: #f6f8fa;
+  --dsw-alias-button-info-hover: #eef1f4;
+  --dsw-alias-button-floating-fill: #ffffff;
+  --dsw-alias-button-floating-hover: #f6f8fa;
+  --dsw-alias-button-ghost-active-fill: #e6ebf0;
+  --dsw-alias-button-ghost-active-hover: #d8dee4;
+
+  /* Interactive */
+  --dsw-alias-interactive-bg-hover: #f6f8fa;
+  --dsw-alias-interactive-bg-active: #e6ebf0;
+  --dsw-alias-interactive-bg-hover-accent: rgba(84, 152, 255, 0.1);
+
+  /* Sidebar */
+  --dsw-specific-sidebar-fill: #ffffff;
+  --dsw-specific-sidebar-nav-item-active: #f6f8fa;
+  --dsw-specific-sidebar-nav-item-active-accent: #5498ff;
+  --dsw-specific-sidebar-nav-item-hover: #f6f8fa;
+
+  /* State colors */
+  --dsw-alias-state-success-primary: #1a7f37;
+  --dsw-alias-state-success-secondary: rgba(31, 136, 61, 0.15);
+  --dsw-alias-state-warn-primary: #9a6700;
+  --dsw-alias-state-warn-secondary: rgba(154, 103, 0, 0.15);
+  --dsw-alias-state-error-primary: #cf222e;
+  --dsw-alias-state-error-secondary: rgba(207, 34, 46, 0.15);
+
+  /* Code */
+  --dsw-alias-markdown-code-block: #f6f8fa;
+  --dsw-alias-markdown-inline-code: #eef1f4;
+  --dsw-alias-markdown-tag: #d8dee4;
+
+  /* Scrollbars */
+  --dsw-alias-scrollbar-bg-l1: #d8dee4;
+  --dsw-alias-scrollbar-bg-l2: #c8d1d9;
+  --dsw-alias-scrollbar-hover-l1: #c8d1d9;
+  --dsw-alias-scrollbar-hover-l2: #b6c0ca;
+
+  /* Chrome accents */
+  --dsw-alias-tooltip-bg: #ffffff;
+  --dsw-alias-hovercard-bg: #ffffff;
+  --dsw-alias-toast-bg: #ffffff;
+}
+
+/* Dark / Codex palette — opt-in via `theme: codex` or the UI's own dark
+   preference. */
 body[data-ds-dark-theme] {
   /* Surfaces — Codex / GitHub dark */
   --dsw-alias-bg-base: #0d1117;

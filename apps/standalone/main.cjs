@@ -28,20 +28,15 @@ function dataDir() {
 /**
  * Where the bundled dsh backend lives.
  *
- * Three layouts are supported:
+ * Two layouts are supported:
  *  - Installed app (setup): `backend/` sits next to this main.cjs.
- *  - Packaged (electron-builder, asar: false): app files - including
- *    `backend/` - are copied to `resources/app/`, so the backend is at
- *    `resources/app/backend`.
  *  - Unpackaged dev (`electron .` from the standalone source dir):
  *    `process.resourcesPath` IS the app dir, so the backend sits directly
- *    under it. Prefer the installed/app layouts, fall back to the dev path.
+ *    under it. Prefer the installed layout, fall back to the dev path.
  */
 function backendDir() {
   const beside = path.join(__dirname, 'backend');
   if (fs.existsSync(beside)) return beside;
-  const packaged = path.join(process.resourcesPath, 'app', 'backend');
-  if (fs.existsSync(packaged)) return packaged;
   return path.join(process.resourcesPath, 'backend');
 }
 
@@ -218,7 +213,7 @@ function createWindow(url) {
     height: 800,
     minWidth: 720,
     minHeight: 480,
-    backgroundColor: '#0d1117',
+    backgroundColor: '#ffffff',
     autoHideMenuBar: true,
     show: false,
     webPreferences: {
@@ -235,7 +230,7 @@ function createWindow(url) {
     win.show();
     setTimeout(closeSplash, 300);
   });
-  nativeTheme.themeSource = 'dark';
+  nativeTheme.themeSource = 'light';
 
   win.webContents.setWindowOpenHandler(({ url: target }) => {
     if (/^https?:/i.test(target)) shell.openExternal(target);
@@ -307,7 +302,7 @@ function createSplash() {
     frame: false,
     resizable: false,
     show: false,
-    backgroundColor: '#0d1117',
+    backgroundColor: '#ffffff',
     webPreferences: {
       contextIsolation: true,
       nodeIntegration: false,

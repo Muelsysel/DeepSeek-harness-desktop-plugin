@@ -8,7 +8,7 @@
 
 ## 特性
 
-- 🖱️ **一键启动**：双击桌面快捷方式即出窗口（Codex 风格：GitHub 深色系 + 品牌蓝，可关闭）
+- 🖱️ **一键启动**：双击桌面快捷方式即出窗口（默认白色浅色风格，可切换深色 Codex 皮肤）
 - 🪟 原生 Electron 窗口，加载 `http://127.0.0.1:<port>` 的实时 UI
 - ⌨️ Web UI 里输入 `/desktop` 打开/复用窗口（同一后端只开一个）
 - 🔗 外部链接走系统浏览器
@@ -23,16 +23,16 @@
 
 1. 到 [GitHub Releases](https://github.com/Muelsysel/DeepSeek-harness-desktop-plugin/releases) 下载 `DeepSeek-Harness-Desktop-Setup-<版本>.exe`
 2. 双击安装（免管理员），安装完成自动启动
-3. **无需安装 Node.js / pnpm / DeepSeek Harness**——后端和运行时全部内置；首次启动闪屏显示进度（内置依赖初始化），之后秒开
+3. **无需安装 Node.js / pnpm / DeepSeek Harness**——后端和 Electron 运行时全部内置；首次启动闪屏显示进度（内置依赖初始化），之后秒开
 
 安装位置：`%LOCALAPPDATA%\Programs\DeepSeek-Harness-Desktop`（无空格路径），桌面快捷方式带鲸鱼图标，开始菜单含卸载入口。私有数据放在 `%APPDATA%\DeepSeek-Harness-Desktop`（不碰你的 `$DSH_HOME` profile），**关窗即退出**。
 
-### 方式二：zip 便携版（免安装）
+### 方式二：zip 便携版（免安装，需本机 Node.js）
 
-1. 下载 `DeepSeek-harness-desktop-plugin-<版本>.zip` 并解压（需 Node.js ≥ 22.19，**必须**，低于 22 无法运行；pnpm 无需手动安装，注册时自动装）
+1. 下载 `DeepSeek-harness-desktop-plugin-<版本>.zip` 并解压（需 Node.js ≥ 22.19，**必须**；pnpm 无需手动安装，注册时自动装）
 2. 双击根目录 **`start.cmd`**，按 [1/5]–[5/5] 完成首次设置：
    - [1/5] 检查 Node.js
-   - [2/5] 检查 DeepSeek Harness（dsh CLI）；未安装时由 launcher 自动通过 `npx @deepseek-ai/dsh web` 获取（首次联网下载，之后秒起，无需手动安装）
+   - [2/5] 检查 DeepSeek Harness（dsh CLI）；未安装时由 launcher 自动通过 `npx @deepseek-ai/dsh web` 获取（首次联网下载，之后秒起）
    - [3/5] 注册本插件到 `$DSH_HOME\profiles\web`
    - [4/5] 创建桌面快捷方式（可选，鲸鱼图标）
    - [5/5] 启动桌面窗口
@@ -41,7 +41,7 @@
 
 ### 方式三：手动装进已有 dsh profile（进阶）
 
-前置：Node.js ≥ 22.19（**必须**，低于 22 无法运行；web UI 依赖 pi-ai 声明的下限）、pnpm（无需手动装，注册时自动安装，corepack 或 npm 均可）。
+前置：Node.js ≥ 22.19（**必须**）、pnpm（无需手动装，注册时自动安装）。
 
 ```bat
 :: 1) （可选）一次性安装到 web profile——不装也行：直接点启动，首次会自动注册
@@ -57,7 +57,7 @@ bin\dsh-desktop.cmd
 2. 把 `dsh-desktop` 追加到 profile 的 `dsh.profile.bundles`（幂等，有备份）
 3. bundle patch（`patch\desktop.bundle.yml`）插入 `desktop` 行：`autoOpen` 由 `DSH_DESKTOP_LAUNCH` 决定
 
-> 也可以跳过 install.cmd：`bin\dsh-desktop.cmd` 首次点击时会检测插件是否已注册（`install-profile.mjs --check`：0 就绪 / 1 需注册 / 2 profile 尚未创建），未注册就自动注册一次再启动（profile 不存在会自动创建最小骨架）——**zip 解压后即点即用**。install.cmd 仍推荐用于需要 Web UI 里 `/desktop` 命令或想显式管理的时候。
+> 也可以跳过 install.cmd：`bin\dsh-desktop.cmd` 首次点击时会检测插件是否已注册（`install-profile.mjs --check`：0 就绪 / 1 需注册 / 2 profile 尚未创建），未注册就自动注册一次再启动（profile 不存在会自动创建最小骨架）——**zip 解压后即点即用**。
 
 使用方式：
 
@@ -68,7 +68,6 @@ bin\dsh-desktop.cmd
 | `bin\dsh-desktop.cmd` | 一键启动：`dsh web` + 自动开窗（可加参数，如 `--port 3180`）；未注册时首次自动注册 |
 | `create-shortcut.cmd`（根目录） | 随时补建桌面快捷方式（鲸鱼图标） |
 | Web UI 里 `/desktop` | 打开/复用当前后端的桌面窗口 |
-| `bin\make-shortcut.cmd` | 同上（等价） |
 | `bin\uninstall.cmd` | 从 profile 移除插件（含 package.json 备份） |
 
 > 不设置 `DSH_DESKTOP_LAUNCH` 时，普通 `dsh web` 保持"只用浏览器"的行为，不会弹窗。
@@ -83,7 +82,7 @@ bin\dsh-desktop.cmd
 | `autoOpen` | `false` | 启动时自动开窗（launcher 通过 env 置 true） |
 | `title` | `DeepSeek Harness` | 窗口标题 |
 | `width` / `height` | `1280` / `800` | 初始窗口尺寸 |
-| `theme` | `codex` | `codex` = Codex 皮肤；`default` = 原样 UI |
+| `theme` | `default` | `default` = 白色浅色风格；`codex` = 深色 Codex 皮肤 |
 | `electronArgs` | `[]` | 附加传给 Electron 的 argv（如 `--no-sandbox`） |
 
 环境变量：`DSH_DESKTOP_LAUNCH=1` 开启 auto-open；`DSH_DESKTOP_TITLE` 覆盖标题；`DSH_DESKTOP_ELECTRON` 手动指定 electron 可执行文件路径（兜底）；`DSH_DESKTOP_DEBUG=1` 写调试日志到 `%TEMP%\dsh-desktop-debug.log`。
@@ -101,16 +100,17 @@ node scripts\package.mjs        :: → dist\DeepSeek-harness-desktop-plugin-<版
 node scripts\make-setup.mjs     :: → dist\DeepSeek-Harness-Desktop-Setup-<版本>.exe
 ```
 
-开发命令：`npm run build` / `npm run typecheck` / `npm test`（`node --test`，30 项单测）。
+开发命令：`npm run build` / `npm run typecheck` / `npm test`（`node --test`）。
 
 ## 项目结构
 
 ```
 src/           插件逻辑（Cordis 插件：/desktop 命令、自动开窗、窗口管理）
-desktop/       Electron 外壳（main.cjs / preload.cjs / codex.css 皮肤，窗口鲸鱼图标）
+desktop/       Electron 外壳（main.cjs / preload.cjs / codex.css 皮肤 / splash.html）
 patch/         插入 profile 的 bundle 行
 bin/           一键启动 / 安装 / 卸载 / 快捷方式脚本 + 官方图标
-scripts/       安装脚本、离线打包（package.mjs）、安装器构建（make-setup.mjs）
+apps/standalone/ 自包含桌面 app 源码（后端拥有的 main.cjs + bundled backend/，打包进 setup.exe）
+scripts/       安装脚本、离线打包（package.mjs）、安装器构建（make-setup.mjs）、快捷方式（make-shortcut.ps1）
 setup/         NSIS 安装器脚本（desktop-setup.nsi）
 start.cmd      根目录首次引导向导（zip 版入口）
 create-shortcut.cmd  根目录补建桌面快捷方式

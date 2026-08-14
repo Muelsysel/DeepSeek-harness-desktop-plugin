@@ -1,44 +1,14 @@
 {
   "name": "dsh-desktop-standalone",
-  "version": "0.1.0",
-  "description": "DeepSeek Harness Desktop - standalone packaged desktop app (bundled dsh backend + Codex-like window)",
+  "version": "0.1.2",
+  "description": "DeepSeek Harness Desktop - self-contained desktop app source (bundled dsh backend + Electron window; packaged by scripts/make-setup.mjs into the NSIS setup installer)",
   "private": true,
   "main": "main.cjs",
   "scripts": {
     "backend": "node scripts/build-backend.mjs",
-    "build:exe": "node scripts/build-backend.mjs && electron-builder --win portable",
     "start": "electron ."
   },
   "devDependencies": {
-    "electron": "^43.4.0",
-    "electron-builder": "^26.0.12"
-  },
-  "build": {
-    "appId": "dev.dsh.desktop",
-    "productName": "DeepSeek Harness Desktop",
-    "asar": false,
-    "files": [
-      "main.cjs",
-      "preload.cjs",
-      "codex.css",
-      "splash.html",
-      "icon.png",
-      "backend/**"
-    ],
-    "directories": {
-      "output": "../../dist/exe"
-    },
-    "win": {
-      "target": [
-        {
-          "target": "portable",
-          "arch": ["x64"]
-        }
-      ],
-      "icon": "../../bin/dsh-desktop.png"
-    },
-    "portable": {
-      "artifactName": "DeepSeek-Harness-Desktop-${version}.exe"
-    }
+    "electron": "^43.4.0"
   }
 }
