@@ -45,10 +45,13 @@ writeFileSync(
 console.log("[backend] npm install (plain layout) ...");
 run("npm", ["install", "--prefix", backendDir, "--no-audit", "--no-fund"], { shell: process.platform === "win32" });
 
-// npm's --prefix install can leave a junction back to the parent package
-// (the standalone app itself) in backend/node_modules; electron-builder
-// chokes on it, so drop it if present.
-rmSync(join(backendDir, "node_modules", "dsh-desktop-standalone"), { recursive: true, force: true });
+// npm's --prefix install can leave junctions back to the parent packages in
+// backend/node_modules - seen as `dsh-desktop-standalone` (apps/standalone)
+// and `dsh-desktop` (the repo root). Copying them would drag the whole repo
+// into any bundle, so drop them if present.
+for (const name of ["dsh-desktop-standalone", "dsh-desktop"]) {
+  rmSync(join(backendDir, "node_modules", name), { recursive: true, force: true });
+}
 
 // Copy the shared shell assets (skin + preload) next to the app main, plus
 // the official DeepSeek icon used by the startup splash.

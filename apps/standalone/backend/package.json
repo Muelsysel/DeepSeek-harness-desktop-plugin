@@ -6,6 +6,6 @@
     "@deepseek-ai/dsh": "0.1.0-rc.6",
     "@deepseek-ai/dsh-base": "0.1.0-rc.6",
     "@deepseek-ai/dsh-web-app": "0.1.0-rc.6",
-    "dsh-desktop-standalone": "file:.."
+    "dsh-desktop": "file:../../.."
   }
 }

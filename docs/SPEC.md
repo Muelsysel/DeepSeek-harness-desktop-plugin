@@ -18,15 +18,15 @@ DeepSeek Harness runs as a web UI in the browser. The user wants a desktop-plugi
 4. **Installer** (`scripts/install-profile.mjs`, `bin/install.cmd`): installs the package into the web profile and appends it to `dsh.profile.bundles` (backup before edit). pnpm is auto-installed when missing (corepack, then `npm install -g pnpm`).
 5. **One-click launcher** (`bin/dsh-desktop.cmd`): boots the web profile with auto-open armed; on first launch it auto-registers the plugin into the booted profile if missing (`scripts\install-profile.mjs --check`: exit 0 ready / 1 needs install / 2 profile not created yet — the installer creates a minimal profile skeleton on the spot, so a brand-new machine works on the very first click), so a fresh zip extraction is click-to-use without running `bin\install.cmd` first; it spawns the startup splash immediately and feeds it phase tokens (`download`/`boot`/`loading`/`ready`) through `%TEMP%\dsh-desktop-splash.status`; `bin/uninstall.cmd` removes it.
 6. **First-run wizard + root entry points** (`start.cmd`, `create-shortcut.cmd` at the repo/zip root): guided setup `[1/5]` Node check (hard-required ≥ 22.19; wizard blocks older versions) → `[2/5]` DeepSeek Harness (dsh CLI) check — dsh runs via `npx @deepseek-ai/dsh web`, which the launcher executes automatically when missing → `[3/5]` plugin registration → `[4/5]` Desktop shortcut (optional, whale icon; `noshortcut` arg skips it) → `[5/5]` launch. `create-shortcut.cmd` re-creates the Desktop shortcut any time.
-7. **Setup installer** (`setup/desktop-setup.nsi` + `scripts/make-setup.mjs`, NSIS, MUI2, SimpChinese/English): installs the package to `%LOCALAPPDATA%\Programs\DeepSeek-Harness-Desktop` (no spaces in the path — pnpm rejects `link:` specs with spaces; no admin), expands the payload, creates Desktop + Start Menu shortcuts with the official icon, registers an uninstall entry, and runs the first-run wizard on finish. Built by the NSIS compiler bundled under `tools/` (gitignored; fetched from electron-builder-binaries).
+7. **Setup installer** (`setup/desktop-setup.nsi` + `scripts/make-setup.mjs`, NSIS, MUI2, SimpChinese/English): installs the **self-contained desktop app** to `%LOCALAPPDATA%\Programs\DeepSeek-Harness-Desktop` (no spaces in the path — pnpm rejects `link:` specs with spaces; no admin). The app bundles the dsh backend + the Electron runtime + the shell with startup splash — **no Node / pnpm / dsh installation is needed on the target machine**; it boots its own backend into a private `%APPDATA%` profile and closes it when the window closes. Creates Desktop + Start Menu shortcuts with the official icon, registers an uninstall entry, and launches the app on finish. Built by the NSIS compiler bundled under `tools/` (gitignored; fetched from electron-builder-binaries).
 8. **Docs**: `CONTEXT.md`, `docs/grill.md`, `docs/SPEC.md`, `docs/adr/0001..0004`, `README.md`, `AGENTS.md`.
-9. ~~**Standalone packaged app**~~ — **cancelled** (replaced by the setup installer, deliverable 7). The code remains in `apps/standalone/` (incl. the startup splash: a frameless 440×300 window showing dependency-install/backend-boot/UI-load progress before handoff) but it is no longer built or shipped.
+9. ~~**Standalone portable exe**~~ — the *portable-exe distribution* is cancelled, but the standalone technology (ADR-0004) is **revived as the setup installer's payload** (deliverable 7): the same bundled backend + private profile + startup splash (`apps/standalone/main.cjs`, `splash.html`), now installed to `%LOCALAPPDATA%` and launched by the bundled Electron runtime instead of a portable exe.
 
 ## Non-goals
 
 - No reimplementation of harness features — the window loads the live profile.
 - No client-side UI plugin/button (the `/desktop` command covers in-UI launch).
-- The plugin itself is not a bundled app — it stays a plugin + launcher + setup installer; the standalone portable exe (ADR-0004) was cancelled in favor of the setup installer.
+- The plugin itself is not a bundled app — it stays a plugin + launcher; the self-contained setup app (deliverable 7) is the no-environment delivery (bundled backend), replacing the cancelled portable exe (ADR-0004).
 - No file:// + IPC transport (not shipped by dsh).
 
 ## Acceptance criteria
@@ -37,7 +37,7 @@ DeepSeek Harness runs as a web UI in the browser. The user wants a desktop-plugi
 4. Closing the window does not kill the dsh backend; stopping dsh kills the window.
 5. A plain `dsh web` (no env flag) opens no window and keeps the browser flow.
 6. The launcher works from a fresh extraction: first click auto-registers the plugin (creating the profile skeleton when none exists) and opens the window; the window carries the official DeepSeek whale icon.
-7. The setup installer installs to `%LOCALAPPDATA%`, creates whale-icon shortcuts and an uninstall entry, and the first-run wizard installs DeepSeek Harness when missing, registers the plugin, and launches.
+7. The setup installer installs the self-contained app (bundled backend + Electron) to `%LOCALAPPDATA%` with whale-icon shortcuts and an uninstall entry; the app boots its own backend into a private profile with a progress splash, opens the window, and needs no Node/pnpm/dsh on the machine.
 
 ## Seams under test (confirmed with tdd)
 

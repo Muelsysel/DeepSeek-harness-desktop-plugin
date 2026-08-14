@@ -19,13 +19,13 @@
 
 ## 怎么用
 
-### 方式一：安装版 setup.exe（推荐，自动引导）
+### 方式一：安装版 setup.exe（推荐，自带后端、免环境）
 
 1. 到 [GitHub Releases](https://github.com/Muelsysel/DeepSeek-harness-desktop-plugin/releases) 下载 `DeepSeek-Harness-Desktop-Setup-<版本>.exe`
-2. 双击运行，按向导完成安装
-3. 安装完成后自动启动**首次引导**：检查/安装 DeepSeek Harness（dsh CLI）→ 注册本插件 → 创建桌面快捷方式 → 打开窗口
+2. 双击安装（免管理员），安装完成自动启动
+3. **无需安装 Node.js / pnpm / DeepSeek Harness**——后端和运行时全部内置；首次启动闪屏显示进度（内置依赖初始化），之后秒开
 
-安装位置：`%LOCALAPPDATA%\Programs\DeepSeek-Harness-Desktop`（无空格路径，pnpm 要求；免管理员权限），桌面快捷方式带鲸鱼图标，开始菜单含卸载入口。
+安装位置：`%LOCALAPPDATA%\Programs\DeepSeek-Harness-Desktop`（无空格路径），桌面快捷方式带鲸鱼图标，开始菜单含卸载入口。私有数据放在 `%APPDATA%\DeepSeek-Harness-Desktop`（不碰你的 `$DSH_HOME` profile），**关窗即退出**。
 
 ### 方式二：zip 便携版（免安装）
 
@@ -63,7 +63,8 @@ bin\dsh-desktop.cmd
 
 | 方式 | 说明 |
 |---|---|
-| `start.cmd`（根目录） | 首次引导：[1/5] Node → [2/5] 装 DeepSeek Harness → [3/5] 注册插件 → [4/5] 桌面快捷方式 → [5/5] 启动 |
+| 安装版 setup.exe | **自带后端**：免 Node/pnpm/dsh，闪屏进度，首次初始化后秒开 |
+| zip 版 + `start.cmd`（根目录） | 插件方式：需 Node.js ≥ 22.19，首次引导 [1/5]–[5/5] 后秒开 |
 | `bin\dsh-desktop.cmd` | 一键启动：`dsh web` + 自动开窗（可加参数，如 `--port 3180`）；未注册时首次自动注册 |
 | `create-shortcut.cmd`（根目录） | 随时补建桌面快捷方式（鲸鱼图标） |
 | Web UI 里 `/desktop` | 打开/复用当前后端的桌面窗口 |
@@ -95,7 +96,8 @@ npm install
 npm run build
 node scripts\package.mjs        :: → dist\DeepSeek-harness-desktop-plugin-<版本>.zip
 
-:: 安装版 setup.exe（NSIS 向导安装器，含鲸鱼图标；首次自动下载 NSIS 编译器到 tools\）
+:: 安装版 setup.exe（NSIS 安装器：打包自包含 app —— 内置 dsh 后端 + Electron + 闪屏，
+:: 目标机器免 Node/pnpm/dsh；首次构建自动下载 NSIS 编译器到 tools\）
 node scripts\make-setup.mjs     :: → dist\DeepSeek-Harness-Desktop-Setup-<版本>.exe
 ```
 
