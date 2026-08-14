@@ -30,7 +30,7 @@
 前置：Node.js ≥ 22.19、pnpm。
 
 ```bat
-:: 1) 一次性安装到 web profile（备份 profile\package.json 为 .bak）
+:: 1) （可选）一次性安装到 web profile——不装也行：直接点启动，首次会自动注册
 bin\install.cmd
 
 :: 2) 以后每次"点击启动"（等价于 DSH_DESKTOP_LAUNCH=1 dsh web）
@@ -43,11 +43,13 @@ bin\dsh-desktop.cmd
 2. 把 `dsh-desktop` 追加到 profile 的 `dsh.profile.bundles`（幂等，有备份）
 3. bundle patch（`patch\desktop.bundle.yml`）插入 `desktop` 行：`autoOpen` 由 `DSH_DESKTOP_LAUNCH` 决定
 
+> 也可以跳过 install.cmd：`bin\dsh-desktop.cmd` 首次点击时会检测插件是否已注册（`install-profile.mjs --check`：0 就绪 / 1 需注册 / 2 profile 尚未创建），未注册就自动注册一次再启动——**zip 解压后即点即用**，无需先手动安装。install.cmd 仍推荐用于需要 Web UI 里 `/desktop` 命令或想显式管理的时候。
+
 使用方式：
 
 | 方式 | 说明 |
 |---|---|
-| `bin\dsh-desktop.cmd` | 一键启动：`dsh web` + 自动开窗（可加参数，如 `--port 3180`） |
+| `bin\dsh-desktop.cmd` | 一键启动：`dsh web` + 自动开窗（可加参数，如 `--port 3180`）；未注册时首次自动注册 |
 | Web UI 里 `/desktop` | 打开/复用当前后端的桌面窗口 |
 | `bin\make-shortcut.cmd` | 在桌面创建"DeepSeek Harness 桌面版"快捷方式（无控制台，关窗即退后端） |
 | `bin\uninstall.cmd` | 从 profile 移除插件（含 package.json 备份） |
@@ -85,7 +87,7 @@ npx electron-builder --win portable
 :: → dist\exe\DeepSeek-Harness-Desktop-<版本>.exe
 ```
 
-开发命令：`npm run build` / `npm run typecheck` / `npm test`（`node --test`，50 项单测）。
+开发命令：`npm run build` / `npm run typecheck` / `npm test`（`node --test`，29 项单测）。
 
 ## 项目结构
 

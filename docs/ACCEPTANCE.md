@@ -8,7 +8,7 @@ Process: the mattpocock flow (`grill-me` → `to-spec` → `tdd` → `code-revie
 |---|---|
 | `npm run build` (tsc) | pass |
 | `npm run typecheck` | pass |
-| `npm test` (node --test) | 25/25 pass (seams per SPEC) |
+| `npm test` (node --test) | 29/29 pass (seams per SPEC) |
 
 ## Live verification (this machine, real dsh 0.1.0-rc.6)
 
@@ -20,6 +20,7 @@ Process: the mattpocock flow (`grill-me` → `to-spec` → `tdd` → `code-revie
 6. **Hard stop** — `taskkill /F` on the dsh process: the window self-quits via the `--parent-pid` orphan watchdog (verified).
 7. **Port safety** — launcher defaults to `--port 0` (OS-assigned), never colliding with an existing 3080.
 8. **Install/uninstall** — `scripts/install-profile.mjs` installs (`link:` + bundle append, package.json backed up) and removes (`--remove`) into `$DSH_HOME/profiles/web`; the real web profile is installed and verified.
+9. **Auto-register on first launch** — `bin\dsh-desktop.cmd` checks registration via `scripts\install-profile.mjs --check` (exit 0 ready / 1 needs install / 2 profile not created) and registers once before booting when missing (pnpm `link:` + bundle append). Verified: `--check` exit codes unit-tested; the launcher flow exercised end-to-end against a throwaway `DSH_HOME` with a stub `dsh` on PATH — unregistered profile → auto-registered then booted; already-registered profile → fast path with no re-install; missing profile → boots without touching anything.
 
 ## Standalone app (ADR-0004) — live verification (this machine, portable exe)
 

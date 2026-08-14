@@ -2,7 +2,7 @@
 /**
  * Install (or remove) the dsh-desktop plugin into/from a dsh profile.
  *
- *   node scripts/install-profile.mjs [--profile <name>] [--remove]
+ *   node scripts/install-profile.mjs [--profile <name>] [--remove|--check]
  *
  * Install steps:
  *   1. resolve the profile directory under $DSH_HOME/profiles/<name>
@@ -10,6 +10,10 @@
  *   3. append `dsh-desktop` to the profile's `dsh.profile.bundles` list
  *      (idempotent), backing up package.json first
  *   4. print what was done and how to launch
+ *
+ * `--check` is read-only: exit 0 = registered and loadable, 1 = needs
+ * install, 2 = profile not created yet (used by bin\dsh-desktop.cmd to
+ * auto-register a fresh extraction on first launch).
  *
  * With `--remove`, step 2/3 are inverted: the bundle entry is dropped (with a
  * backup) and the package is removed via pnpm. This is the single owner of
@@ -28,11 +32,12 @@ const repoRoot = resolve(__dirname, "..");
 const PLUGIN_NAME = "dsh-desktop";
 
 function parseArgs(argv) {
-  const out = { profile: "web", remove: false, help: false };
+  const out = { profile: "web", remove: false, check: false, help: false };
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
     if (arg === "--profile") out.profile = argv[++i];
     else if (arg === "--remove") out.remove = true;
+    else if (arg === "--check") out.check = true;
     else if (arg === "--help" || arg === "-h") out.help = true;
   }
   return out;
@@ -76,19 +81,55 @@ function dropBundle(profilePkgPath) {
   return true;
 }
 
+/**
+ * --check: is the plugin registered in the profile and loadable?
+ * "Registered" means the bundle entry exists, the pnpm link resolves, and the
+ * built lib is present. Prints a one-word status; the exit code is the
+ * verdict: 0 = ready, 1 = needs install, 2 = profile not created yet (the
+ * first `dsh web` boot creates it; the next click registers).
+ */
+function checkInstalled(profile, packageJsonPath) {
+  if (!existsSync(profile) || !existsSync(packageJsonPath)) {
+    console.log("profile missing");
+    process.exitCode = 2;
+    return;
+  }
+  let pkg;
+  try {
+    pkg = JSON.parse(readFileSync(packageJsonPath, "utf8"));
+  } catch {
+    console.log("not installed");
+    process.exitCode = 1;
+    return;
+  }
+  const bundles = pkg.dsh?.profile?.bundles;
+  const registered = Array.isArray(bundles) && bundles.includes(PLUGIN_NAME);
+  const linked = existsSync(join(profile, "node_modules", PLUGIN_NAME));
+  const built = existsSync(join(repoRoot, "lib", "index.js"));
+  const ready = registered && linked && built;
+  console.log(ready ? "installed" : "not installed");
+  process.exitCode = ready ? 0 : 1;
+}
+
 function main() {
   const args = parseArgs(process.argv.slice(2));
   if (args.help) {
-    console.log("usage: node scripts/install-profile.mjs [--profile web] [--remove]");
+    console.log("usage: node scripts/install-profile.mjs [--profile web] [--remove|--check]");
     return;
   }
 
   const profile = profileDir(args.profile);
+  const packageJsonPath = join(profile, "package.json");
+
+  // --check: report status without touching anything (used by the launcher).
+  if (args.check) {
+    checkInstalled(profile, packageJsonPath);
+    return;
+  }
+
   if (!existsSync(profile)) {
     throw new Error(`profile directory not found: ${profile} (set DSH_HOME if needed)`);
   }
-
-  const packageJsonPath = join(profile, "package.json");
   if (!existsSync(packageJsonPath)) {
     throw new Error(`profile has no package.json: ${packageJsonPath}`);
   }
