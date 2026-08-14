@@ -14,7 +14,7 @@
 !include "MUI2.nsh"
 
 !ifndef APP_VERSION
-  !define APP_VERSION "0.1.3"
+  !define APP_VERSION "0.1.4"
 !endif
 !define APP_NAME "DeepSeek Harness Desktop"
 !define APP_ID "dev.dsh.desktop"

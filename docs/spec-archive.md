@@ -1,6 +1,6 @@
 # Spec Archive — dsh-desktop（开发暂告一段落存档）
 
-> 状态：**已实现并发布（v0.1.3）**。本文是项目"开发暂时告一段落"时的收尾存档，供下次开发快速恢复上下文。词汇见 `CONTEXT.md`，架构决策见 `docs/adr/0001..0004`，仓库布局与开发规则见 `AGENTS.md`。
+> 状态：**已实现并发布（v0.1.4，开发确定暂停）**。本文是项目的收尾存档，供后续恢复开发时快速恢复上下文。词汇见 `CONTEXT.md`，架构决策见 `docs/adr/0001..0004`，仓库布局与开发规则见 `AGENTS.md`。
 
 ## Problem Statement
 
@@ -52,7 +52,7 @@ DeepSeek Harness 本身是一个浏览器端的 web UI（`dsh web`）。用户�
 - **安装器**：NSIS（MUI2，中英双语），装到 `%LOCALAPPDATA%\Programs\DeepSeek-Harness-Desktop`（无空格路径，pnpm 拒绝含空格的 `link:` spec）；桌面/开始菜单/安装目录三处入口 + 卸载项；NSIS 编译器捆绑在 gitignored `tools/`，构建时自动获取。
 - **启动闪屏**：`--splash` 模式 frameless 进度窗口（440×300，鲸鱼图标），通过共享状态文件/executeJavaScript 报告阶段（`boot` → `loading` → `ready`）；插件 launcher 用 `%TEMP%\dsh-desktop-splash.status` 喂阶段令牌。
 - **图标**：官方 DeepSeek 鲸鱼图标（`bin/dsh-desktop.ico` + `.png`）用于窗口、任务栏（`app.setAppUserModelId`）、快捷方式、安装器、卸载器。
-- **版本与发布**：语义化版本，release 流程为 `npm run build` → `scripts/package.mjs`（插件 zip）→ `scripts/make-setup.mjs`（setup exe）→ GitHub release（两个产物）。v0.1.3 为当前版本。
+- **版本与发布**：语义化版本，release 流程为 `npm run build` → `scripts/package.mjs`（插件 zip）→ `scripts/make-setup.mjs`（setup exe）→ GitHub release（两个产物）。v0.1.4 为最终版本。
 
 ## Testing Decisions
 
@@ -79,7 +79,7 @@ DeepSeek Harness 本身是一个浏览器端的 web UI（`dsh web`）。用户�
 ## Further Notes
 
 - **快速恢复开发**：先读 `CONTEXT.md`（词汇）与 `docs/adr/0001..0004`（决策），再读 `AGENTS.md`（布局 + 规则 + 命令）。测试 seam 列表见上文 Testing Decisions。
-- **当前交付**：GitHub release v0.1.3 含 `DeepSeek-harness-desktop-plugin-0.1.3.zip`（插件，需 Node ≥ 22.19）与 `DeepSeek-Harness-Desktop-Setup-0.1.3.exe`（自包含安装版）。
+- **当前交付**：GitHub release v0.1.4 含 `DeepSeek-harness-desktop-plugin-0.1.4.zip`（插件，需 Node ≥ 22.19）与 `DeepSeek-Harness-Desktop-Setup-0.1.4.exe`（自包含安装版）。
 - **已知边界**：根目录 `DeepSeek Harness 桌面版.lnk` 指向本机构建路径（v0.1.3 起重新入库作为 zip 免脚本入口）；其他解压位置用 `create-shortcut.cmd` 重建。
 - **会话持久化观察**：桌面端会话曾出现"消失"现象（调查未完成即转入收尾）——下次开发若复现，从 `$DSH_HOME/sessions` 与桌面私有 home 的 `sessions/` 目录存在性入手，对照 `dsh-session-persistence-jsonl` 的 root 配置。
 - **全局 mattskills**：35 个工程/流程技能已安装到 `~/.dsh/skills`（user-dsh 全局层，`dsh-skill-filesystem` 默认扫描），任何项目可用。仓库不再保留本地副本（`.agents/`、`.claude/`、`agent/` 已删除——全局安装后无需项目级副本）。

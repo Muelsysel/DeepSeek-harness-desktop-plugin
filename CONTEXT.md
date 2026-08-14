@@ -1,6 +1,6 @@
 # dsh-desktop Context
 
-A DeepSeek Harness plugin that puts the dsh web UI in a Codex-like native window, launched with one click. Development paused at v0.1.3; `docs/spec-archive.md` records the state of play for resuming.
+A DeepSeek Harness plugin that puts the dsh web UI in a Codex-like native window, launched with one click. Development paused at v0.1.4; `docs/spec-archive.md` records the state of play for resuming.
 
 ## Language
 
@@ -37,7 +37,7 @@ The self-contained installed app (`apps/standalone/`, packaged by `scripts/make-
 _Avoid_: standalone plugin, the exe, desktop app build
 
 **Spec archive**:
-`docs/spec-archive.md` — the state-of-play record written when development paused (v0.1.3): problem/solution, user stories, implementation and testing decisions, out-of-scope, and resume pointers. Read it (plus `CONTEXT.md` and the ADRs) to restart development quickly.
+`docs/spec-archive.md` — the state-of-play record written when development paused (v0.1.4): problem/solution, user stories, implementation and testing decisions, out-of-scope, and resume pointers. Read it (plus `CONTEXT.md` and the ADRs) to restart development quickly.
 _Avoid_: the spec, SPEC.md (deleted), requirements doc
 
 **Global skills**:

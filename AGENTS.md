@@ -1,6 +1,6 @@
 # AGENTS.md
 
-dsh-desktop is a DeepSeek Harness plugin: an Electron shell around the live dsh web UI. Read `CONTEXT.md` for vocabulary before touching behavior. Development is paused at v0.1.3 — `docs/spec-archive.md` is the state-of-play archive for resuming; architecture decisions live in `docs/adr/0001..0004`.
+dsh-desktop is a DeepSeek Harness plugin: an Electron shell around the live dsh web UI. Read `CONTEXT.md` for vocabulary before touching behavior. Development is paused at v0.1.4 — `docs/spec-archive.md` is the state-of-play archive for resuming; architecture decisions live in `docs/adr/0001..0004`.
 
 ## Layout
 

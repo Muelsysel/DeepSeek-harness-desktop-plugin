@@ -1,6 +1,6 @@
 {
   "name": "dsh-desktop-standalone",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "DeepSeek Harness Desktop - self-contained desktop app source (bundled dsh backend + Electron window; packaged by scripts/make-setup.mjs into the NSIS setup installer)",
   "private": true,
   "main": "main.cjs",
