@@ -50,9 +50,11 @@ run("npm", ["install", "--prefix", backendDir, "--no-audit", "--no-fund"], { she
 // chokes on it, so drop it if present.
 rmSync(join(backendDir, "node_modules", "dsh-desktop-standalone"), { recursive: true, force: true });
 
-// Copy the shared shell assets (skin + preload) next to the app main.
+// Copy the shared shell assets (skin + preload) next to the app main, plus
+// the official DeepSeek icon used by the startup splash.
 for (const name of ["preload.cjs", "codex.css"]) {
   cpSync(join(repoRoot, "desktop", name), join(appDir, name));
 }
+cpSync(join(repoRoot, "bin", "dsh-desktop.png"), join(appDir, "icon.png"));
 
 console.log("[backend] done.");

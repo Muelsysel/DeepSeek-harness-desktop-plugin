@@ -56,8 +56,65 @@ function log(msg) {
   }
 }
 
+/** Count files under a directory (follows symlinked dirs once). */
+async function countFiles(dir) {
+  let n = 0;
+  const entries = await fsp.readdir(dir, { withFileTypes: true });
+  for (const e of entries) {
+    if (e.isDirectory()) n += await countFiles(path.join(dir, e.name));
+    else if (e.isSymbolicLink()) {
+      try {
+        const target = await fsp.realpath(path.join(dir, e.name));
+        n += (await fsp.stat(target)).isDirectory() ? await countFiles(target) : 1;
+      } catch {
+        /* dangling link: count nothing */
+      }
+    } else n += 1;
+  }
+  return n;
+}
+
+/**
+ * Copy a tree reporting per-file progress. Symlinks are dereferenced (a
+ * junction to the portable temp extraction must never be copied verbatim —
+ * it would dangle on the next run).
+ */
+async function copyDirWithProgress(src, dest, onProgress) {
+  const total = Math.max(1, await countFiles(src));
+  let done = 0;
+  async function walk(s, d) {
+    await fsp.mkdir(d, { recursive: true });
+    const entries = await fsp.readdir(s, { withFileTypes: true });
+    for (const e of entries) {
+      const sp = path.join(s, e.name);
+      const dp = path.join(d, e.name);
+      if (e.isDirectory()) {
+        await walk(sp, dp);
+      } else if (e.isSymbolicLink()) {
+        try {
+          const target = await fsp.realpath(sp);
+          const st = await fsp.stat(target);
+          if (st.isDirectory()) await walk(target, dp);
+          else {
+            await fsp.copyFile(target, dp);
+            done += 1;
+            onProgress(done, total);
+          }
+        } catch {
+          /* unreadable link: skip */
+        }
+      } else {
+        await fsp.copyFile(sp, dp);
+        done += 1;
+        onProgress(done, total);
+      }
+    }
+  }
+  await walk(src, dest);
+}
+
 /** Ensure the private profile exists; returns the DSH home dir. */
-async function ensureProfile() {
+async function ensureProfile(onProgress) {
   const home = dataDir();
   const profileDir = path.join(home, 'profiles', PROFILE_NAME);
   await fsp.mkdir(profileDir, { recursive: true });
@@ -87,7 +144,14 @@ async function ensureProfile() {
   const src = path.join(backendDir(), 'node_modules');
   if (!fs.existsSync(nm)) {
     log('first run: installing backend dependencies (one-time) ...');
-    await fsp.cp(src, nm, { recursive: true, errorOnExist: false });
+    let lastTick = 0;
+    await copyDirWithProgress(src, nm, (done, total) => {
+      // Throttle: the splash update is a DOM round-trip, not per-file.
+      const now = Date.now();
+      if (now - lastTick < 50 && done !== total) return;
+      lastTick = now;
+      onProgress(done, total);
+    });
     log('backend dependencies ready');
   }
   return home;
@@ -161,7 +225,12 @@ function createWindow(url) {
       spellcheck: false,
     },
   });
-  win.once('ready-to-show', () => win.show());
+  win.once('ready-to-show', () => {
+    handedOff = true;
+    setProgress(100, '启动完成');
+    win.show();
+    setTimeout(closeSplash, 300);
+  });
   nativeTheme.themeSource = 'dark';
 
   win.webContents.setWindowOpenHandler(({ url: target }) => {
@@ -217,6 +286,63 @@ function createWindow(url) {
 
 let backendChild = null;
 let quitting = false;
+let handedOff = false;
+
+// ---------------------------------------------------------------------------
+// Startup splash: a small frameless window shown immediately, so the user sees
+// progress (bar + percent + status) while the profile and backend boot. The
+// main window takes over once the UI is ready to show.
+// ---------------------------------------------------------------------------
+let splash = null;
+let splashReady = null;
+
+function createSplash() {
+  splash = new BrowserWindow({
+    width: 440,
+    height: 300,
+    frame: false,
+    resizable: false,
+    show: false,
+    backgroundColor: '#0d1117',
+    webPreferences: {
+      contextIsolation: true,
+      nodeIntegration: false,
+      sandbox: true,
+    },
+  });
+  splashReady = new Promise((resolve) => {
+    splash.webContents.once('did-finish-load', resolve);
+  });
+  splash.loadFile(path.join(__dirname, 'splash.html')).catch(() => {});
+  splash.once('ready-to-show', () => splash.show());
+  splash.on('closed', () => {
+    // User closed the splash before the main window took over: cancel.
+    if (!handedOff && !quitting) {
+      quitting = true;
+      stopBackend();
+      app.quit();
+    }
+    splash = null;
+  });
+  return splashReady;
+}
+
+function setProgress(percent, status) {
+  if (splash && !splash.isDestroyed()) {
+    splash.webContents
+      .executeJavaScript(
+        `updateProgress(${Math.round(percent)}, ${JSON.stringify(status)})`,
+        true,
+      )
+      .catch(() => {});
+  }
+  log(`progress ${Math.round(percent)}% ${status}`);
+}
+
+function closeSplash() {
+  if (splash && !splash.isDestroyed()) splash.destroy();
+  splash = null;
+}
 
 function stopBackend() {
   const child = backendChild;
@@ -238,24 +364,44 @@ if (process.env.DSH_DESKTOP_DEBUG_PORT) {
 
 app.whenReady().then(async () => {
   try {
-    const home = await ensureProfile();
+    await createSplash();
+    setProgress(4, '正在准备运行环境…');
+
+    const home = await ensureProfile((done, total) => {
+      const pct = 6 + 24 * (done / total);
+      setProgress(pct, `正在安装后端依赖 ${Math.round(pct)}%…`);
+    });
     const profileDir = path.join(home, 'profiles', PROFILE_NAME);
     log(`profile: ${profileDir}`);
+
+    setProgress(30, '正在启动后端服务…');
+    // Backend boot time is unpredictable: animate within the boot band while
+    // waiting for the URL line, then jump to the handoff phase.
+    let bootPct = 30;
+    const bootTimer = setInterval(() => {
+      bootPct = Math.min(bootPct + 0.8, 75);
+      setProgress(bootPct, '正在启动后端服务…');
+    }, 200);
 
     const url = await startBackend(home, profileDir, (code, signal) => {
       if (quitting) return;
       // Unexpected backend death: tell the user and quit.
+      closeSplash();
       dialog.showErrorBox(
         PRODUCT,
         `The harness backend stopped unexpectedly (code ${code}, signal ${signal}).`,
       );
       app.quit();
     }).catch(async (error) => {
+      clearInterval(bootTimer);
+      closeSplash();
       dialog.showErrorBox(PRODUCT, `Failed to start the harness backend: ${error.message}`);
       app.exit(1);
     });
     if (!url) return;
+    clearInterval(bootTimer);
 
+    setProgress(80, '正在加载界面…');
     const win = createWindow(url);
     win.on('closed', () => {
       log('window closed; stopping backend');
@@ -264,6 +410,7 @@ app.whenReady().then(async () => {
       app.quit();
     });
   } catch (error) {
+    closeSplash();
     dialog.showErrorBox(PRODUCT, `Startup failed: ${error.message}`);
     app.exit(1);
   }

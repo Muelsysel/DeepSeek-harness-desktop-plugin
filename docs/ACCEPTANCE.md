@@ -8,7 +8,7 @@ Process: the mattpocock flow (`grill-me` → `to-spec` → `tdd` → `code-revie
 |---|---|
 | `npm run build` (tsc) | pass |
 | `npm run typecheck` | pass |
-| `npm test` (node --test) | 22/22 pass (seams per SPEC) |
+| `npm test` (node --test) | 25/25 pass (seams per SPEC) |
 
 ## Live verification (this machine, real dsh 0.1.0-rc.6)
 
@@ -29,6 +29,7 @@ Process: the mattpocock flow (`grill-me` → `to-spec` → `tdd` → `code-revie
 4. **Private home** — the standalone never touches `$DSH_HOME` profiles (runs under its own `%APPDATA%` home with `--port 0`).
 5. **Close stops the backend** — closing the window terminates the backend child and exits the app; the port stops answering and no dsh process remains.
 6. **Backend HMR compatibility** — the backend child runs under `ELECTRON_RUN_AS_NODE` with `--expose-internals` (the dsh CLI's loader needs Node internals for its HMR service; the `node-addon-require-builtin` fallback does not load in Electron-as-node, which first surfaced as `failed to apply loader entry … (cordis-plugin-hmr): --expose-internals is required for HMR service`).
+7. **Startup splash** — a frameless 440×300 splash (`splash.html` + official icon) shows the boot pipeline and hands off to the main window once the UI is ready to show. CDP-verified live (this machine, unpacked build, `DSH_DESKTOP_DEBUG`): the splash target (`file://…/splash.html`) is present from launch; the main-window target (`http://127.0.0.1:<port>/`) appears at handoff; the debug log shows the full sequence `progress 30% 正在启动后端服务…` → animated 31–36% → `progress 80% 正在加载界面…` (the instant the `dsh web: http://127.0.0.1:61997` line lands) → `progress 100% 启动完成`. The first-run band (backend-dependency copy with per-file progress, 6–30%) was exercised on this machine too (profile + `node_modules` created at first run).
 
 ## Code review — two axes (per the code-review skill)
 

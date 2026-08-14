@@ -13,6 +13,7 @@
 - ⌨️ 插件版支持 Web UI 里输入 `/desktop` 打开/复用窗口（同一后端只开一个）
 - 🔗 外部链接走系统浏览器
 - 🛑 独立版**关窗即退出后端**；插件版关窗不杀后端，停 dsh 才关窗
+- 🚀 **启动闪屏**：独立版启动先显示进度闪屏（依赖安装 → 后端启动 → 界面加载），主窗口就绪后自动交接，不再干等黑屏
 - 🎨 使用官方 DeepSeek 图标
 
 ## 怎么用
@@ -20,7 +21,7 @@
 ### 方式一：独立便携版（推荐，免安装）
 
 1. 到 [GitHub Releases](https://github.com/Muelsysel/DeepSeek-harness-desktop-plugin/releases) 下载 `DeepSeek-Harness-Desktop-<版本>.exe`
-2. 双击运行 —— 内置 dsh 后端 + 桌面窗口自动打开，无需 Node / pnpm / profile
+2. 双击运行 —— 内置 dsh 后端 + 桌面窗口自动打开，无需 Node / pnpm / profile。首次启动会先把内置后端依赖拷入私有目录（约 25 秒，闪屏实时显示进度），之后秒开。
 
 私有数据放在 `%APPDATA%\DeepSeek-Harness-Desktop`（不碰你现有的 `$DSH_HOME` profile），**关窗即退出**。详见 [docs/adr/0004-standalone-packaged-app.md](docs/adr/0004-standalone-packaged-app.md)。
 

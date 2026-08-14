@@ -1,0 +1,78 @@
+<!doctype html>
+<!--
+  DeepSeek Harness Desktop — startup splash.
+  Shown immediately while the profile and backend boot; the main window takes
+  over once the UI is ready. Driven by main.cjs via updateProgress(percent, status).
+-->
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self'; style-src 'unsafe-inline'">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    background: #0d1117;
+    color: #f0f6fc;
+    font-family: "Segoe UI", "Microsoft YaHei", system-ui, sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+    cursor: default;
+    overflow: hidden;
+  }
+  .card { width: 340px; text-align: center; }
+  .icon { width: 72px; height: 72px; margin-bottom: 20px; }
+  h1 { font-size: 17px; font-weight: 600; letter-spacing: .3px; margin-bottom: 30px; }
+  .bar {
+    height: 6px;
+    border-radius: 3px;
+    background: #21262d;
+    overflow: hidden;
+  }
+  .fill {
+    height: 100%;
+    width: 0;
+    border-radius: 3px;
+    background: #5498ff;
+    transition: width .18s ease;
+  }
+  .meta {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+    font-size: 12px;
+    color: #9da7b3;
+  }
+  .status {
+    margin-top: 8px;
+    font-size: 12px;
+    color: #6e7681;
+    min-height: 16px;
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <img class="icon" src="icon.png" alt="DeepSeek">
+    <h1>DeepSeek Harness Desktop</h1>
+    <div class="bar"><div class="fill" id="fill"></div></div>
+    <div class="meta">
+      <span id="pct">0%</span>
+      <span id="stage">正在启动…</span>
+    </div>
+    <div class="status" id="status">正在准备运行环境…</div>
+  </div>
+  <script>
+    function updateProgress(percent, status) {
+      const clamped = Math.max(0, Math.min(100, percent));
+      document.getElementById('fill').style.width = clamped + '%';
+      document.getElementById('pct').textContent = Math.round(clamped) + '%';
+      if (typeof status === 'string' && status.length > 0) {
+        document.getElementById('status').textContent = status;
+      }
+    }
+  </script>
+</body>
+</html>

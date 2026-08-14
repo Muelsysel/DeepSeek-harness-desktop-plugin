@@ -21,6 +21,8 @@
       "main.cjs",
       "preload.cjs",
       "codex.css",
+      "splash.html",
+      "icon.png",
       "backend/**"
     ],
     "directories": {

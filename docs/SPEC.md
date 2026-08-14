@@ -19,6 +19,7 @@ DeepSeek Harness runs as a web UI in the browser. The user wants a desktop-plugi
 5. **One-click launcher** (`bin/dsh-desktop.cmd`): boots the web profile with auto-open armed; `bin/uninstall.cmd` removes it.
 6. **Docs**: `CONTEXT.md`, `docs/grill.md`, `docs/SPEC.md`, `docs/adr/0001..0004`, `README.md`, `AGENTS.md`.
 7. **Standalone packaged app** (`apps/standalone/`, ADR-0004): a portable Electron exe that bundles the dsh backend and opens the same Codex-like window over a private profile under `%APPDATA%\DeepSeek-Harness-Desktop`. Closing the window stops the backend. Built by `apps/standalone/scripts/build-backend.mjs` + `electron-builder --win portable` → `dist/exe/DeepSeek-Harness-Desktop-<ver>.exe`. No Node/pnpm/profile setup.
+   - **Startup splash** (`splash.html` + `icon.png`): a frameless 440×300 window shows progress while booting — profile/dependency install (6–30%), backend boot (animated 30–75%), UI load (80%) — then hands off to the main window (100%) once the UI is ready to show. First-run dependency copy reports per-file progress; symlinks are dereferenced (a junction to the portable temp extraction would dangle on the next run). Closing the splash before handoff cancels startup.
 
 ## Non-goals
 
@@ -35,6 +36,7 @@ DeepSeek Harness runs as a web UI in the browser. The user wants a desktop-plugi
 4. Closing the window does not kill the dsh backend; stopping dsh kills the window.
 5. A plain `dsh web` (no env flag) opens no window and keeps the browser flow.
 6. The standalone exe boots the bundled backend and opens exactly one window on the live UI (Codex skin, dark); closing the window stops the backend and exits; it never touches `$DSH_HOME` profiles (private `%APPDATA%` home).
+7. On launch the standalone shows a frameless splash with a progress bar (dependency install → backend boot → UI load) and hands off to the main window once the UI is ready; closing the splash before handoff cancels startup.
 
 ## Seams under test (confirmed with tdd)
 
