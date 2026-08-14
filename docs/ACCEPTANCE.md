@@ -56,5 +56,6 @@ Verdict: contract substantially met — every deliverable and all five spec seam
 ## Final state
 
 - Plugin installed into the real `web` profile (`dsh.profile.bundles` includes `dsh-desktop`; `package.json.bak` backup exists).
-- Screenshot of the running window: `scratch/window-shot.png`.
-- Repo: commits `7b3d3dd`, `f2b8b2c`, `84bb79d` on `master`.
+- Screenshot of the plugin window: `scratch/window-shot.png`; standalone window: `scratch/standalone-window.png`.
+- Distribution artifacts (gitignored `dist/`): `DeepSeek-harness-desktop-plugin-0.1.0.zip` (~150 MB, offline plugin install) and `exe/DeepSeek-Harness-Desktop-0.1.0.exe` (~110 MB portable standalone).
+- Repo: commits `7b3d3dd`..`b5244d4` on `master`.
