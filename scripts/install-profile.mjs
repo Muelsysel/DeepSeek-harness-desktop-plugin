@@ -56,6 +56,51 @@ function run(command, args, opts = {}) {
   return execFileSync(command, args, { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"], ...opts }).trim();
 }
 
+/**
+ * pnpm is required for the profile `link:` install. Auto-install it when
+ * missing: Node ships corepack, which can prepare pnpm without admin rights;
+ * fall back to a global npm install, then fail with a clear message.
+ * NOTE: on Windows every probe must go through a shell - pnpm/npm/corepack
+ * are .cmd shims that execFileSync cannot run directly.
+ */
+export function ensurePnpm() {
+  const sh = { shell: process.platform === "win32" };
+  try {
+    run("pnpm", ["--version"], sh);
+    return;
+  } catch {
+    /* not installed yet */
+  }
+  console.log("pnpm not found - installing it ...");
+  const attempts = [
+    ["corepack", ["prepare", "pnpm@latest", "--activate"]],
+    ["npm", ["install", "-g", "pnpm"]],
+  ];
+  for (const [cmd, args] of attempts) {
+    try {
+      run(cmd, args, sh);
+      run("pnpm", ["--version"], sh);
+      console.log("pnpm installed.");
+      return;
+    } catch {
+      /* try the next option */
+    }
+  }
+  throw new Error(
+    "pnpm is required but could not be installed automatically - install it manually: npm install -g pnpm",
+  );
+}
+
+/** Guard: pnpm `link:` specs with spaces are rejected by pnpm on Windows. */
+export function checkLinkPath(root) {
+  if (/\s/.test(root)) {
+    console.warn(
+      `WARNING: the package path contains a space ("${root}") - pnpm may reject the link. ` +
+        "Move the package to a path without spaces (e.g. C:\\DeepSeek-Harness-Desktop) if registration fails.",
+    );
+  }
+}
+
 /** Append `dsh-desktop` to the profile's bundles list, idempotently. Returns whether a backup was written. */
 function ensureBundle(profilePkgPath) {
   const pkg = JSON.parse(readFileSync(profilePkgPath, "utf8"));
@@ -162,6 +207,7 @@ function main() {
     const dropped = dropBundle(packageJsonPath);
     console.log(dropped ? "dropped dsh-desktop from dsh.profile.bundles (backup: package.json.bak)" : "dsh-desktop not in dsh.profile.bundles");
     try {
+      ensurePnpm();
       run("pnpm", ["remove", PLUGIN_NAME], { cwd: profile, shell: process.platform === "win32" });
       console.log("removed dsh-desktop package from the profile");
     } catch {
@@ -174,6 +220,8 @@ function main() {
   //    `link:` (not `file:`) so local installs stay live with the source —
   //    `file:` copies the package into pnpm's store, which goes stale the
   //    moment the repo changes.
+  ensurePnpm();
+  checkLinkPath(repoRoot);
   console.log(`installing dsh-desktop into profile "${args.profile}" (${profile}) ...`);
   try {
     // Windows resolves .cmd shims only through a shell.
@@ -192,9 +240,15 @@ function main() {
   console.log("  3. plain boot: dsh --profile " + args.profile + " web");
 }
 
-try {
-  main();
-} catch (error) {
-  console.error(`install-profile: ${error.message}`);
-  process.exitCode = 1;
+// Run only when executed directly - importing this module (e.g. from tests)
+// must not trigger a profile install as a side effect.
+import { pathToFileURL } from "node:url";
+const isMain = process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href;
+if (isMain) {
+  try {
+    main();
+  } catch (error) {
+    console.error(`install-profile: ${error.message}`);
+    process.exitCode = 1;
+  }
 }

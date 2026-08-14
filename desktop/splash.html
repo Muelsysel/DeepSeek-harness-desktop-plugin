@@ -1,0 +1,73 @@
+<!doctype html>
+<!--
+  dsh-desktop startup splash. Shown immediately while the launcher boots the
+  backend (npx download on first run, dsh boot, UI load); the main window
+  takes over once it is ready. Driven by desktop/main.cjs --splash, which
+  polls the status file and calls updateStatus(text). Animated indeterminate
+  bar: the phases (download -> boot -> loading -> ready) are staged in
+  main.cjs, not here.
+-->
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self'; style-src 'unsafe-inline'">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    background: #0d1117;
+    color: #f0f6fc;
+    font-family: "Segoe UI", "Microsoft YaHei", system-ui, sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+    cursor: default;
+    overflow: hidden;
+  }
+  .card { width: 340px; text-align: center; }
+  .icon { width: 72px; height: 72px; margin-bottom: 20px; }
+  h1 { font-size: 17px; font-weight: 600; letter-spacing: .3px; margin-bottom: 30px; }
+  .bar {
+    height: 6px;
+    border-radius: 3px;
+    background: #21262d;
+    overflow: hidden;
+    position: relative;
+  }
+  .fill {
+    position: absolute;
+    top: 0; bottom: 0; left: 0;
+    width: 35%;
+    border-radius: 3px;
+    background: linear-gradient(90deg, #5498ff, #7ab0ff);
+    animation: slide 1.1s ease-in-out infinite;
+  }
+  @keyframes slide {
+    0%   { left: -35%; }
+    100% { left: 100%; }
+  }
+  .status {
+    margin-top: 12px;
+    font-size: 12px;
+    color: #9da7b3;
+    min-height: 16px;
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <img class="icon" src="../bin/dsh-desktop.png" alt="DeepSeek">
+    <h1>DeepSeek Harness Desktop</h1>
+    <div class="bar"><div class="fill"></div></div>
+    <div class="status" id="status">正在启动…</div>
+  </div>
+  <script>
+    function updateStatus(text) {
+      if (typeof text === 'string' && text.length > 0) {
+        document.getElementById('status').textContent = text;
+      }
+    }
+  </script>
+</body>
+</html>

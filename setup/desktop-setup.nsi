@@ -24,7 +24,8 @@
 
 Name "${APP_NAME}"
 OutFile "..\dist\DeepSeek-Harness-Desktop-Setup-${APP_VERSION}.exe"
-InstallDir "$LOCALAPPDATA\Programs\${APP_NAME}"
+; No spaces in the install path: pnpm rejects `link:` specs with spaces.
+InstallDir "$LOCALAPPDATA\Programs\DeepSeek-Harness-Desktop"
 RequestExecutionLevel user
 Unicode true
 SetCompressor /SOLID lzma
@@ -57,6 +58,7 @@ Section "Install" SecInstall
   ; Payload: the staged plugin tree (source + lib + node_modules) as one
   ; zip - keeps the installer build fast; expanded below.
   File "..\dist\setup-stage\payload.zip"
+  DetailPrint "Expanding the plugin package (about 150 MB) - this can take a minute ..."
   nsExec::ExecToLog '"$SYSDIR\tar.exe" -xf "$INSTDIR\payload.zip" -C "$INSTDIR"'
   Pop $0
   Delete "$INSTDIR\payload.zip"

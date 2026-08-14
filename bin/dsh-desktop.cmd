@@ -33,6 +33,14 @@ set DSH_DESKTOP_APP=1
 
 set "ROOT=%~dp0.."
 
+rem --- startup splash: show a small progress window immediately, so first
+rem launches (npx download on first run, backend boot, UI load) never sit
+rem silent. The real window reports "ready" through the status file and the
+rem splash closes itself. Set DSH_DESKTOP_SPLASH=0 to disable.
+if not "%DSH_DESKTOP_SPLASH%"=="0" (
+  start "" /b "%ROOT%\node_modules\electron\dist\electron.exe" "%ROOT%\desktop\main.cjs" --splash
+)
+
 rem --- auto-register: the desktop window only opens when dsh-desktop is in
 rem the booted profile's bundles. A fresh zip extraction isn't registered
 rem yet, so register it once before booting. --check exits 0 when ready or
@@ -72,11 +80,16 @@ if errorlevel 1 (
 
 rem `call` is required: dsh/npx are .cmd shims, and invoking a shim from a
 rem batch without `call` breaks env propagation on some cmd versions.
+rem Phase tokens feed the startup splash: download on the npx fallback
+rem (first run), boot when a global dsh is used.
 where dsh >nul 2>nul
 if %errorlevel%==0 (
+  echo boot> "%TEMP%\dsh-desktop-splash.status"
   call dsh web %PORT_ARGS% %*
 ) else (
+  echo download> "%TEMP%\dsh-desktop-splash.status"
   call npx --yes @deepseek-ai/dsh web %PORT_ARGS% %*
 )
+echo ready> "%TEMP%\dsh-desktop-splash.status"
 
 exit /b %errorlevel%

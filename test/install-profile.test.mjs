@@ -5,7 +5,7 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { ensureProfileSkeleton } from "../scripts/install-profile.mjs";
+import { ensureProfileSkeleton, checkLinkPath } from "../scripts/install-profile.mjs";
 
 // install-profile.mjs --check is the read-only verdict the one-click
 // launcher (bin\dsh-desktop.cmd) uses to decide whether a fresh extraction
@@ -112,4 +112,18 @@ test("ensureProfileSkeleton: creates the minimal profile for a fresh dsh install
   } finally {
     rmSync(home, { recursive: true, force: true });
   }
+});
+
+test("checkLinkPath: warns on spaces (pnpm rejects link: paths with spaces), silent otherwise", () => {
+  const seen = [];
+  const originalWarn = console.warn;
+  console.warn = (msg) => seen.push(String(msg));
+  try {
+    checkLinkPath("C:\\Program Files\\DeepSeek Harness");
+    checkLinkPath("C:\\DeepSeek-Harness-Desktop");
+  } finally {
+    console.warn = originalWarn;
+  }
+  assert.equal(seen.length, 1);
+  assert.match(seen[0], /space/);
 });
