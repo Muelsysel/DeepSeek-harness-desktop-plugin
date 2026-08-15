@@ -1,18 +1,20 @@
 @echo off
 rem =====================================================================
-rem  DeepSeek Harness Desktop - first-run wizard.
+rem  DeepSeek Harness Desktop - one-command setup & launch.
 rem
-rem  Guides a fresh extraction through the setup steps:
+rem  After downloading and extracting the zip, run this once - from a
+rem  terminal or by double-clicking it. One command does everything:
 rem    1. Node.js check
-rem    2. DeepSeek Harness (dsh CLI) check - installs it when missing
+rem    2. DeepSeek Harness (dsh CLI) check - the launcher installs it via
+rem       npx on first launch when missing
 rem    3. Register this plugin into the dsh web profile
-rem    4. Create a Desktop shortcut - optional
+rem    4. Create the Desktop shortcut (whale icon)
 rem    5. Launch the desktop window
 rem
-rem  Run it once after unzipping. Later starts are fast: double-click the
-rem  Desktop shortcut (or bin\dsh-desktop.cmd) and the window opens.
-rem  Optional argument "noshortcut" skips step 4 (used by the setup
-rem  installer, which already creates the Desktop shortcut).
+rem  Later starts are fast: double-click the Desktop shortcut
+rem  "DeepSeek Harness 桌面版" (or bin\dsh-desktop.cmd) and the window
+rem  opens. Optional argument "noshortcut" skips step 4 (used by the
+rem  setup installer, which already creates the Desktop shortcut).
 rem =====================================================================
 setlocal
 cd /d "%~dp0"
@@ -21,7 +23,7 @@ title DeepSeek Harness Desktop - Setup
 
 echo.
 echo  ================================================================
-echo    DeepSeek Harness Desktop - first-run setup
+echo    DeepSeek Harness Desktop - setup & launch
 echo  ================================================================
 echo.
 
@@ -78,14 +80,12 @@ if errorlevel 1 (
 )
 echo.
 
-rem ---------- 4) desktop shortcut ----------
+rem ---------- 4) desktop shortcut (automatic) ----------
 if /i "%~1"=="noshortcut" goto :skip_shortcut
-set "MAKE_LNK="
-set /p MAKE_LNK=" [4/5] Create a Desktop shortcut with the DeepSeek icon? [y/N]: "
-if /i "%MAKE_LNK%"=="y" (
-  powershell -NoProfile -ExecutionPolicy Bypass -File "scripts\make-shortcut.ps1"
-) else (
-  echo        Skipped. Run  create-shortcut.cmd  any time to add one.
+echo  [4/5] Creating the Desktop shortcut ...
+powershell -NoProfile -ExecutionPolicy Bypass -File "scripts\make-shortcut.ps1"
+if errorlevel 1 (
+  echo        Shortcut creation failed. Run  create-shortcut.cmd  to retry.
 )
 :skip_shortcut
 echo.

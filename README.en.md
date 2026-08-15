@@ -25,18 +25,16 @@ Put DeepSeek Harness into a native desktop window: **double-click to launch**, a
 Three steps: **download → one command → use**.
 
 1. Download `DeepSeek-harness-desktop-plugin-<version>.zip` from [GitHub Releases](https://github.com/Muelsysel/DeepSeek-Harness-Desktop/releases) and extract it (Node.js ≥ 22.19 **required**; pnpm is auto-installed during registration)
-2. Run **`bin\install.cmd`** once — a single command that registers the plugin (installs it into `$DSH_HOME\profiles\web`) **and creates the Desktop shortcut** "`DeepSeek Harness 桌面版`" (whale icon)
-3. Double-click the **「DeepSeek Harness 桌面版」** icon on your Desktop — the window opens (the first click finishes any remaining initialization)
+2. Open a terminal and run one line (or just double-click root `start.cmd` — same effect):
 
-For everyday use afterwards, pick one:
+   ```bat
+   start.cmd
+   ```
 
-| Entry | Description |
-|---|---|
-| Desktop "DeepSeek Harness 桌面版" shortcut | Double-click to open the window (no console) |
-| `bin\dsh-desktop.cmd` | One-click launcher: `dsh web` + auto window (extra args allowed, e.g. `--port 3180`) |
-| `/desktop` in the web UI | Open/reuse the desktop window for the current backend |
+   This single command automatically: checks Node.js → checks DeepSeek Harness → **registers the plugin** (installs it into `$DSH_HOME\profiles\web`) → **creates the Desktop shortcut** (whale icon) → launches the window. No file edits needed.
+3. The window opens and is ready to use. For everyday use afterwards, double-click the **「DeepSeek Harness 桌面版」** icon on your Desktop (or `bin\dsh-desktop.cmd`, or `/desktop` in the web UI).
 
-> Already installed? Re-running `bin\install.cmd` is safe — registration is idempotent and the shortcut is refreshed. Moved the extraction? Re-run it once to rebuild the shortcut for the new location.
+> Already installed? Re-running `start.cmd` is safe — registration is idempotent and the shortcut is refreshed. Moved the extraction? Re-run it once to rebuild the shortcut for the new location.
 
 ### Option 2: setup.exe installer (bundled backend, no environment needed)
 
@@ -71,10 +69,10 @@ Usage summary:
 
 | Entry | Description |
 |---|---|
-| `bin\install.cmd` (one-time) | **One command**: registers the plugin + creates the Desktop shortcut (whale icon) |
+| `start.cmd` (root, terminal or double-click) | **One command**: Node check → dsh check → register plugin → auto-create Desktop shortcut → launch window |
+| `bin\install.cmd` (one-time) | Register the plugin + create the Desktop shortcut only (no window launch) |
 | Desktop "DeepSeek Harness 桌面版" shortcut | Double-click to open the window (no console) |
 | setup.exe installer | Bundled backend: no Node/pnpm/dsh needed, splash progress, instant after first init; three launch entries (Desktop / Start Menu / install folder) |
-| `start.cmd` (root) | First-run wizard ([1/5]–[5/5]: Node check → dsh check → register → shortcut → launch) |
 | `create-shortcut.cmd` (root) | Create/rebuild the desktop shortcut any time (correct for your extraction path) |
 | `bin\dsh-desktop.cmd` | One-click launcher: `dsh web` + auto window (extra args allowed, e.g. `--port 3180`); auto-registers on first run |
 | `/desktop` in the web UI | Open/reuse the desktop window for the current backend |
