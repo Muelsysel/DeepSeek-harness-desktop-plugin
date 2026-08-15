@@ -20,7 +20,30 @@
 
 ## 怎么用
 
-### 方式一：zip 便携版（推荐，免安装）
+### 方式一：git clone 安装（推荐，紧跟最新代码）
+
+只需三步：**clone → 一行命令 → 使用**。
+
+1. 克隆仓库到本地（需 Node.js ≥ 22.19，**必须**；git 需已安装；建议克隆到无空格的路径）：
+
+   ```bat
+   git clone https://github.com/Muelsysel/DeepSeek-Harness-Desktop.git
+   cd DeepSeek-Harness-Desktop
+   ```
+
+2. 打开命令行输入一行命令（或直接双击根目录 `start.cmd`，效果相同）：
+
+   ```bat
+   start.cmd
+   ```
+
+   这一条命令自动完成：首次构建（`npm install` + `npm run build`）→ 检查 Node.js → 检查 DeepSeek Harness → **注册插件**（装进 `$DSH_HOME\profiles\web`）→ **自动创建桌面快捷方式**（鲸鱼图标）→ 启动窗口。无需修改任何文件。
+3. 窗口打开即用。以后日常使用，双击桌面「**DeepSeek Harness 桌面版**」图标即可（或 `bin\dsh-desktop.cmd` / Web UI 里 `/desktop`）。
+
+> 之后想更新到最新代码：`git pull` 然后重跑 `start.cmd` 即可（注册幂等，快捷方式会刷新）。
+> 也可以先手动构建再启动：`npm install && npm run build && start.cmd`。
+
+### 方式二：zip 便携版（免安装，不需要 git）
 
 只需三步：**下载 → 一行命令 → 使用**。
 
@@ -36,7 +59,7 @@
 
 > 已经装过？重跑这条命令也安全——注册幂等，快捷方式会刷新。换了解压位置，重跑一次即可按新位置重建快捷方式。
 
-### 方式二：安装版 setup.exe（自带后端、免环境）
+### 方式三：安装版 setup.exe（自带后端、免环境）
 
 1. 到 [GitHub Releases](https://github.com/Muelsysel/DeepSeek-Harness-Desktop/releases) 下载 `DeepSeek-Harness-Desktop-Setup-<版本>.exe`
 2. 双击安装（免管理员），安装完成自动启动
@@ -44,7 +67,7 @@
 
 安装位置：`%LOCALAPPDATA%\Programs\DeepSeek-Harness-Desktop`（无空格路径）。启动入口：桌面快捷方式（鲸鱼图标）、开始菜单、安装目录内的 `DeepSeek Harness Desktop.lnk`，任选其一。私有数据放在 `%APPDATA%\DeepSeek-Harness-Desktop`（不碰你的 `$DSH_HOME` profile），**关窗即退出**。
 
-### 方式三：手动装进已有 dsh profile（进阶）
+### 方式四：手动装进已有 dsh profile（进阶）
 
 前置：Node.js ≥ 22.19（**必须**）、pnpm（无需手动装，注册时自动安装）。
 
