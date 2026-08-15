@@ -25,16 +25,16 @@
 只需三步：**下载 → 一行命令 → 使用**。
 
 1. 到 [GitHub Releases](https://github.com/Muelsysel/DeepSeek-Harness-Desktop/releases) 下载 `DeepSeek-harness-desktop-plugin-<版本>.zip` 并解压（需 Node.js ≥ 22.19，**必须**；pnpm 无需手动安装，注册时自动装）
-2. 打开命令行，输入一行命令（或直接双击根目录 `start.cmd`，效果相同）：
+2. 打开命令行（任意目录），输入一行命令——把 `<解压路径>` 换成你的实际解压位置（或直接双击根目录 `start.cmd`，效果相同）：
 
    ```bat
-   start.cmd
+   cd /d "<解压路径>" && start.cmd
    ```
 
    这一条命令自动完成：检查 Node.js → 检查 DeepSeek Harness → **注册插件**（装进 `$DSH_HOME\profiles\web`）→ **自动创建桌面快捷方式**（鲸鱼图标）→ 启动窗口。无需修改任何文件。
 3. 窗口打开即用。以后日常使用，双击桌面「**DeepSeek Harness 桌面版**」图标即可（或 `bin\dsh-desktop.cmd` / Web UI 里 `/desktop`）。
 
-> 已经装过？重跑 `start.cmd` 也安全——注册幂等，快捷方式会刷新。换了解压位置，重跑一次即可按新位置重建快捷方式。
+> 已经装过？重跑这条命令也安全——注册幂等，快捷方式会刷新。换了解压位置，重跑一次即可按新位置重建快捷方式。
 
 ### 方式二：安装版 setup.exe（自带后端、免环境）
 
@@ -69,7 +69,7 @@ bin\dsh-desktop.cmd
 
 | 方式 | 说明 |
 |---|---|
-| `start.cmd`（根目录，命令行或双击） | **一行命令**：检查 Node → 检查 dsh → 注册插件 → 自动建桌面快捷方式 → 启动窗口 |
+| `cd /d "<解压路径>" && start.cmd` | **一行命令**（任意目录可运行；或直接双击根目录 `start.cmd`）：检查 Node → 检查 dsh → 注册插件 → 自动建桌面快捷方式 → 启动窗口 |
 | `bin\install.cmd`（一次性） | 只注册插件 + 创建桌面快捷方式（不启动窗口） |
 | 桌面「DeepSeek Harness 桌面版」快捷方式 | 双击即出窗口（免控制台） |
 | 安装版 setup.exe | 自带后端：免 Node/pnpm/dsh，闪屏进度，首次初始化后秒开；桌面 / 开始菜单 / 安装目录三处启动入口 |
