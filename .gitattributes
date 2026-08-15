@@ -1,0 +1,4 @@
+# Windows batch files must stay CRLF in the working tree — cmd.exe mis-parses
+# LF-only multi-line blocks (e.g. `if ... (` ... `)`), which broke bin\install.cmd.
+*.cmd text eol=crlf
+*.bat text eol=crlf

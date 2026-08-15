@@ -1,11 +1,17 @@
 @echo off
 rem =====================================================================
-rem  dsh-desktop - install into the dsh web profile.
+rem  dsh-desktop - one-command setup: register the plugin and create the
+rem  Desktop shortcut.
 rem
-rem  Installs this plugin package into $DSH_HOME/profiles/web and appends
-rem  it to the profile's bundle list. Afterwards, double-click
-rem  bin\dsh-desktop.cmd to launch the desktop window, or type /desktop
-rem  in the web UI.
+rem  After downloading and extracting the zip, run this once:
+rem      bin\install.cmd
+rem  It registers dsh-desktop into $DSH_HOME/profiles/web (pnpm link +
+rem  bundle append) and creates the Desktop shortcut
+rem  "DeepSeek Harness 桌面版" (whale icon). From then on, double-click
+rem  the Desktop shortcut (or bin\dsh-desktop.cmd) to open the window.
+rem
+rem  Re-running is safe: registration is idempotent and the shortcut is
+rem  overwritten. Pass --profile <name> to register into another profile.
 rem =====================================================================
 setlocal
 cd /d "%~dp0.."
@@ -31,6 +37,13 @@ if errorlevel 1 (
 )
 
 echo.
-echo [dsh-desktop] installed. Create a Desktop shortcut to bin\dsh-desktop.cmd
-echo               and double-click it to open the Codex-like window.
+echo [dsh-desktop] creating the Desktop shortcut ...
+powershell -NoProfile -ExecutionPolicy Bypass -File "scripts\make-shortcut.ps1"
+if errorlevel 1 (
+  echo [dsh-desktop] WARNING: shortcut creation failed - run create-shortcut.cmd to retry.
+)
+
+echo.
+echo [dsh-desktop] Done. Double-click the Desktop shortcut
+echo               "DeepSeek Harness 桌面版" to open the desktop window.
 exit /b 0

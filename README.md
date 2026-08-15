@@ -22,14 +22,21 @@
 
 ### 方式一：zip 便携版（推荐，免安装）
 
-1. 到 [GitHub Releases](https://github.com/Muelsysel/DeepSeek-Harness-Desktop/releases) 下载 `DeepSeek-harness-desktop-plugin-<版本>.zip` 并解压（需 Node.js ≥ 22.19，**必须**；pnpm 无需手动安装，注册时自动装）
-2. **首次请先运行根目录 `start.cmd`** 走完首次引导（[1/5] 检查 Node.js → [2/5] 检查 DeepSeek Harness（未装时 launcher 自动通过 `npx @deepseek-ai/dsh web` 获取）→ [3/5] 注册插件 → [4/5] 创建桌面快捷方式 → [5/5] 启动）
-3. 之后日常使用任选其一：
-   - 桌面快捷方式「`DeepSeek Harness 桌面版.lnk`」——右键 → **发送到 → 桌面快捷方式**，以后双击桌面图标即可启动；第一次点击会自动注册插件再启动
-   - 若解压位置与快捷方式指向的路径不同，改用 `create-shortcut.cmd`（双击一次即可按你的解压位置生成正确路径的桌面快捷方式）
-   - 或直接双击 `bin\dsh-desktop.cmd` 一键启动
+只需三步：**下载 → 一条命令 → 使用**。
 
-也可以跳过引导：直接双击 `bin\dsh-desktop.cmd`，首次点击会自动注册插件再启动。注册过一次之后，每次点快捷方式都是秒开。
+1. 到 [GitHub Releases](https://github.com/Muelsysel/DeepSeek-Harness-Desktop/releases) 下载 `DeepSeek-harness-desktop-plugin-<版本>.zip` 并解压（需 Node.js ≥ 22.19，**必须**；pnpm 无需手动安装，注册时自动装）
+2. 双击运行 **`bin\install.cmd`** —— 一条命令完成：注册插件（装进 `$DSH_HOME\profiles\web`）+ 自动在桌面创建「`DeepSeek Harness 桌面版`」快捷方式（鲸鱼图标）
+3. 双击桌面上的 **「DeepSeek Harness 桌面版」** 图标，窗口即开即用（首次点击自动完成剩余初始化）
+
+之后日常使用，任选其一：
+
+| 入口 | 说明 |
+|---|---|
+| 桌面「DeepSeek Harness 桌面版」快捷方式 | 双击即出窗口（免控制台） |
+| `bin\dsh-desktop.cmd` | 一键启动：`dsh web` + 自动开窗（可加参数，如 `--port 3180`） |
+| Web UI 里 `/desktop` | 打开/复用当前后端的桌面窗口 |
+
+> 已经装过？重跑 `bin\install.cmd` 也安全——注册幂等，快捷方式会刷新。换了解压位置，重跑一次即可按新位置重建快捷方式。
 
 ### 方式二：安装版 setup.exe（自带后端、免环境）
 
@@ -44,29 +51,31 @@
 前置：Node.js ≥ 22.19（**必须**）、pnpm（无需手动装，注册时自动安装）。
 
 ```bat
-:: 1) （可选）一次性安装到 web profile——不装也行：直接点启动，首次会自动注册
+:: 1) 安装到 web profile（注册插件 + 创建桌面快捷方式）
 bin\install.cmd
 
 :: 2) 以后每次"点击启动"（等价于 DSH_DESKTOP_LAUNCH=1 dsh web）
 bin\dsh-desktop.cmd
 ```
 
-安装做了什么：
+`bin\install.cmd` 做了什么：
 
 1. 用 pnpm 把本插件作为 `link:` 依赖装进 `$DSH_HOME\profiles\web`
 2. 把 `dsh-desktop` 追加到 profile 的 `dsh.profile.bundles`（幂等，有备份）
 3. bundle patch（`patch\desktop.bundle.yml`）插入 `desktop` 行：`autoOpen` 由 `DSH_DESKTOP_LAUNCH` 决定
+4. 在桌面创建「`DeepSeek Harness 桌面版`」快捷方式（鲸鱼图标）
 
-> 也可以跳过 install.cmd：`bin\dsh-desktop.cmd` 首次点击时会检测插件是否已注册（`install-profile.mjs --check`：0 就绪 / 1 需注册 / 2 profile 尚未创建），未注册就自动注册一次再启动（profile 不存在会自动创建最小骨架）——**zip 解压后即点即用**。
+> 也可以跳过 install.cmd：`bin\dsh-desktop.cmd` 首次点击时会检测插件是否已注册（`install-profile.mjs --check`：0 就绪 / 1 需注册 / 2 profile 尚未创建），未注册就自动注册一次再启动（profile 不存在会自动创建最小骨架）——但桌面快捷方式仍需 `bin\install.cmd` 或 `create-shortcut.cmd` 创建。
 
 使用方式：
 
 | 方式 | 说明 |
 |---|---|
-| zip 版 + `start.cmd`（根目录） | **推荐**：需 Node.js ≥ 22.19，首次先运行 `start.cmd` 引导 [1/5]–[5/5]，之后秒开 |
-| 根目录「DeepSeek Harness 桌面版.lnk」 | zip 版免脚本快捷方式：右键 → 发送到 → 桌面快捷方式即可 |
+| `bin\install.cmd`（一次性） | **一条命令**：注册插件 + 自动创建桌面快捷方式（鲸鱼图标） |
+| 桌面「DeepSeek Harness 桌面版」快捷方式 | 双击即出窗口（免控制台） |
 | 安装版 setup.exe | 自带后端：免 Node/pnpm/dsh，闪屏进度，首次初始化后秒开；桌面 / 开始菜单 / 安装目录三处启动入口 |
-| `create-shortcut.cmd`（根目录） | 一键生成桌面快捷方式（鲸鱼图标，按实际解压位置生成正确路径） |
+| `start.cmd`（根目录） | 首次引导向导（[1/5]–[5/5]：Node 检查 → dsh 检查 → 注册 → 快捷方式 → 启动） |
+| `create-shortcut.cmd`（根目录） | 单独补建/重建桌面快捷方式（按实际解压位置生成正确路径） |
 | `bin\dsh-desktop.cmd` | 一键启动：`dsh web` + 自动开窗（可加参数，如 `--port 3180`）；未注册时首次自动注册 |
 | Web UI 里 `/desktop` | 打开/复用当前后端的桌面窗口 |
 | `bin\uninstall.cmd` | 从 profile 移除插件（含 package.json 备份） |

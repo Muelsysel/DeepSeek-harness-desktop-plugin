@@ -22,14 +22,21 @@ Put DeepSeek Harness into a native desktop window: **double-click to launch**, a
 
 ### Option 1: zip portable version (recommended, no install)
 
-1. Download `DeepSeek-harness-desktop-plugin-<version>.zip` from [GitHub Releases](https://github.com/Muelsysel/DeepSeek-Harness-Desktop/releases) and extract it (Node.js ≥ 22.19 **required**; pnpm is auto-installed during registration)
-2. **Run root `start.cmd` first** to go through the guided wizard: [1/5] Node.js check → [2/5] DeepSeek Harness check (the launcher fetches dsh via `npx @deepseek-ai/dsh web` when missing) → [3/5] register plugin → [4/5] create desktop shortcut → [5/5] launch
-3. For everyday use afterwards, pick one:
-   - The desktop shortcut "`DeepSeek Harness 桌面版.lnk`" — right-click → **Send to → Desktop (create shortcut)**; double-click it to launch (first click auto-registers the plugin)
-   - If you extracted to a different location than the shortcut points to, run `create-shortcut.cmd` once instead — it creates a desktop shortcut with the correct paths for your extraction location
-   - Or double-click `bin\dsh-desktop.cmd` to launch directly
+Three steps: **download → one command → use**.
 
-You can also skip the wizard: double-click `bin\dsh-desktop.cmd` — it auto-registers on first run, then launches instantly on every click afterwards.
+1. Download `DeepSeek-harness-desktop-plugin-<version>.zip` from [GitHub Releases](https://github.com/Muelsysel/DeepSeek-Harness-Desktop/releases) and extract it (Node.js ≥ 22.19 **required**; pnpm is auto-installed during registration)
+2. Run **`bin\install.cmd`** once — a single command that registers the plugin (installs it into `$DSH_HOME\profiles\web`) **and creates the Desktop shortcut** "`DeepSeek Harness 桌面版`" (whale icon)
+3. Double-click the **「DeepSeek Harness 桌面版」** icon on your Desktop — the window opens (the first click finishes any remaining initialization)
+
+For everyday use afterwards, pick one:
+
+| Entry | Description |
+|---|---|
+| Desktop "DeepSeek Harness 桌面版" shortcut | Double-click to open the window (no console) |
+| `bin\dsh-desktop.cmd` | One-click launcher: `dsh web` + auto window (extra args allowed, e.g. `--port 3180`) |
+| `/desktop` in the web UI | Open/reuse the desktop window for the current backend |
+
+> Already installed? Re-running `bin\install.cmd` is safe — registration is idempotent and the shortcut is refreshed. Moved the extraction? Re-run it once to rebuild the shortcut for the new location.
 
 ### Option 2: setup.exe installer (bundled backend, no environment needed)
 
@@ -44,30 +51,31 @@ Install location: `%LOCALAPPDATA%\Programs\DeepSeek-Harness-Desktop` (no spaces)
 Prereq: Node.js ≥ 22.19 (**required**), pnpm (auto-installed during registration).
 
 ```bat
-:: 1) (optional) install into the web profile once — not required:
-::    the first click auto-registers anyway
+:: 1) install into the web profile (registers the plugin + creates the Desktop shortcut)
 bin\install.cmd
 
 :: 2) launch every time afterwards (equivalent to DSH_DESKTOP_LAUNCH=1 dsh web)
 bin\dsh-desktop.cmd
 ```
 
-What the install does:
+What `bin\install.cmd` does:
 
 1. Adds this plugin as a `link:` dependency of `$DSH_HOME\profiles\web` via pnpm
 2. Appends `dsh-desktop` to the profile's `dsh.profile.bundles` (idempotent, with backup)
 3. The bundle patch (`patch\desktop.bundle.yml`) inserts the `desktop` row; `autoOpen` is driven by `DSH_DESKTOP_LAUNCH`
+4. Creates the Desktop shortcut "`DeepSeek Harness 桌面版`" (whale icon)
 
-> You can skip `bin\install.cmd` entirely: `bin\dsh-desktop.cmd` checks registration on first click (`install-profile.mjs --check`: 0 ready / 1 needs install / 2 profile not created yet) and registers once before booting (creating the minimal profile skeleton when needed) — **the zip is click-to-use right after extraction**.
+> You can skip `bin\install.cmd`: `bin\dsh-desktop.cmd` checks registration on first click (`install-profile.mjs --check`: 0 ready / 1 needs install / 2 profile not created yet) and registers once before booting (creating the minimal profile skeleton when needed) — but the Desktop shortcut still needs `bin\install.cmd` or `create-shortcut.cmd`.
 
 Usage summary:
 
 | Entry | Description |
 |---|---|
-| `start.cmd` (root) | **Recommended**: needs Node.js ≥ 22.19; run `start.cmd` first for the guided [1/5]–[5/5] wizard, then instant |
-| Root "DeepSeek Harness 桌面版.lnk" | Zip version, script-free shortcut: right-click → Send to → Desktop |
+| `bin\install.cmd` (one-time) | **One command**: registers the plugin + creates the Desktop shortcut (whale icon) |
+| Desktop "DeepSeek Harness 桌面版" shortcut | Double-click to open the window (no console) |
 | setup.exe installer | Bundled backend: no Node/pnpm/dsh needed, splash progress, instant after first init; three launch entries (Desktop / Start Menu / install folder) |
-| `create-shortcut.cmd` (root) | Create the desktop shortcut any time (whale icon, correct for your extraction path) |
+| `start.cmd` (root) | First-run wizard ([1/5]–[5/5]: Node check → dsh check → register → shortcut → launch) |
+| `create-shortcut.cmd` (root) | Create/rebuild the desktop shortcut any time (correct for your extraction path) |
 | `bin\dsh-desktop.cmd` | One-click launcher: `dsh web` + auto window (extra args allowed, e.g. `--port 3180`); auto-registers on first run |
 | `/desktop` in the web UI | Open/reuse the desktop window for the current backend |
 | `bin\uninstall.cmd` | Remove the plugin from the profile (package.json backed up) |
