@@ -22,23 +22,15 @@ Put DeepSeek Harness into a native desktop window: **double-click to launch**, a
 
 ### Option 1: install via git clone (recommended — always the latest code)
 
-Three steps: **clone → one command → use**.
+Run these in a terminal (Node.js ≥ 22.19 **required**; git needed; clone to a path without spaces):
 
-1. Clone the repo (Node.js ≥ 22.19 **required**; git needed; clone to a path without spaces):
+```bat
+git clone https://github.com/Muelsysel/DeepSeek-Harness-Desktop.git
+cd DeepSeek-Harness-Desktop
+start.cmd
+```
 
-   ```bat
-   git clone https://github.com/Muelsysel/DeepSeek-Harness-Desktop.git
-   cd DeepSeek-Harness-Desktop
-   ```
-
-2. Open a terminal and run one line (or just double-click root `start.cmd` — same effect):
-
-   ```bat
-   start.cmd
-   ```
-
-   This single command automatically: first build (`npm install` + `npm run build`) → checks Node.js → checks DeepSeek Harness → **registers the plugin** (installs it into `$DSH_HOME\profiles\web`) → **creates the Desktop shortcut** (whale icon) → launches the window. No file edits needed.
-3. The window opens and is ready to use. For everyday use afterwards, double-click the **「DeepSeek Harness 桌面版」** icon on your Desktop (or `bin\dsh-desktop.cmd`, or `/desktop` in the web UI).
+`start.cmd` automatically: first build (`npm install` + `npm run build`) → checks Node.js → checks DeepSeek Harness → **registers the plugin** (installs it into `$DSH_HOME\profiles\web`) → **creates the Desktop shortcut** (whale icon) → launches the window. No file edits needed. The window opens and is ready to use; for everyday use afterwards, double-click the **「DeepSeek Harness 桌面版」** icon on your Desktop (or `bin\dsh-desktop.cmd`, or `/desktop` in the web UI).
 
 > To update to the latest code later: `git pull`, then re-run `start.cmd` (registration is idempotent and the shortcut is refreshed).
 > You can also build manually first: `npm install && npm run build && start.cmd`.

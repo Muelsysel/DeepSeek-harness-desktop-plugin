@@ -22,23 +22,15 @@
 
 ### 方式一：git clone 安装（推荐，紧跟最新代码）
 
-只需三步：**clone → 一行命令 → 使用**。
+在命令行里依次运行（需 Node.js ≥ 22.19，**必须**；git 需已安装；建议克隆到无空格的路径）：
 
-1. 克隆仓库到本地（需 Node.js ≥ 22.19，**必须**；git 需已安装；建议克隆到无空格的路径）：
+```bat
+git clone https://github.com/Muelsysel/DeepSeek-Harness-Desktop.git
+cd DeepSeek-Harness-Desktop
+start.cmd
+```
 
-   ```bat
-   git clone https://github.com/Muelsysel/DeepSeek-Harness-Desktop.git
-   cd DeepSeek-Harness-Desktop
-   ```
-
-2. 打开命令行输入一行命令（或直接双击根目录 `start.cmd`，效果相同）：
-
-   ```bat
-   start.cmd
-   ```
-
-   这一条命令自动完成：首次构建（`npm install` + `npm run build`）→ 检查 Node.js → 检查 DeepSeek Harness → **注册插件**（装进 `$DSH_HOME\profiles\web`）→ **自动创建桌面快捷方式**（鲸鱼图标）→ 启动窗口。无需修改任何文件。
-3. 窗口打开即用。以后日常使用，双击桌面「**DeepSeek Harness 桌面版**」图标即可（或 `bin\dsh-desktop.cmd` / Web UI 里 `/desktop`）。
+`start.cmd` 自动完成：首次构建（`npm install` + `npm run build`）→ 检查 Node.js → 检查 DeepSeek Harness → **注册插件**（装进 `$DSH_HOME\profiles\web`）→ **自动创建桌面快捷方式**（鲸鱼图标）→ 启动窗口。无需修改任何文件。窗口打开即用，以后双击桌面「**DeepSeek Harness 桌面版**」图标即可（或 `bin\dsh-desktop.cmd` / Web UI 里 `/desktop`）。
 
 > 之后想更新到最新代码：`git pull` 然后重跑 `start.cmd` 即可（注册幂等，快捷方式会刷新）。
 > 也可以先手动构建再启动：`npm install && npm run build && start.cmd`。
